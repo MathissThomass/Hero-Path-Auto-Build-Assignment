@@ -6,11 +6,11 @@
 
 
     <Window>
-        <Widget HeightSizePolicy="StretchToParent" WidthSizePolicy="Fixed" SuggestedWidth="1275"
+        <Widget HeightSizePolicy="StretchToParent" WidthSizePolicy="Fixed" SuggestedWidth="670"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top">
             <Children>
-                <ListPanel HeightSizePolicy="StretchToParent" WidthSizePolicy="Fixed" SuggestedWidth="700" HorizontalAlignment="Left"
+                <ListPanel HeightSizePolicy="StretchToParent" WidthSizePolicy="Fixed" SuggestedWidth="650" HorizontalAlignment="Left"
                            VerticalAlignment="Top" UpdateChildrenStates="true" MarginLeft="15" MarginTop="125"
                            MarginBottom="50" StackLayout.LayoutMethod="VerticalTopToBottom">
                     <Children>

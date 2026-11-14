@@ -40,6 +40,7 @@ public class TemplateManagerVM : ViewModel
                 Name = "New created template"
             };
             newTemplate.CreateNewTemplate();
+            newTemplate.UpdateSavedStateSnapshot();
             _templateManagerCharacterList.Add(newTemplate);
             _currentTemplate = _templateManagerCharacterList[0];
         }

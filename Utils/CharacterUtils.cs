@@ -9,9 +9,22 @@ namespace HeroPathAutoBuildAssignment.Utils;
 
 public class CharacterUtils
 {
+    private static readonly string[] WarSailsSkillIds = { "Mariner", "Boatswain", "Shipmaster" };
+
+    public static bool IsWarSailsActive()
+    {
+        var objectManager = Game.Current?.ObjectManager;
+        if (objectManager == null)
+        {
+            return false;
+        }
+
+        return WarSailsSkillIds.All(id => objectManager.GetObject<SkillObject>(id) != null);
+    }
+
     public static IReadOnlyList<SkillObject> GetSkillsWithWarSails()
     {
-        return new List<SkillObject>
+        var skills = new List<SkillObject>
         {
             DefaultSkills.OneHanded,
             DefaultSkills.Bow,
@@ -19,22 +32,30 @@ public class CharacterUtils
             DefaultSkills.Scouting,
             DefaultSkills.Charm,
             DefaultSkills.Steward,
-            Game.Current.ObjectManager.GetObject<SkillObject>("Mariner"),
             DefaultSkills.TwoHanded,
             DefaultSkills.Crossbow,
             DefaultSkills.Athletics,
             DefaultSkills.Tactics,
             DefaultSkills.Leadership,
             DefaultSkills.Medicine,
-            Game.Current.ObjectManager.GetObject<SkillObject>("Boatswain"),
             DefaultSkills.Polearm,
             DefaultSkills.Throwing,
             DefaultSkills.Crafting,
             DefaultSkills.Roguery,
             DefaultSkills.Trade,
             DefaultSkills.Engineering,
-            Game.Current.ObjectManager.GetObject<SkillObject>("Shipmaster"),
         };
+
+        if (!IsWarSailsActive())
+        {
+            return skills;
+        }
+
+        var objectManager = Game.Current.ObjectManager;
+        skills.Insert(6, objectManager.GetObject<SkillObject>("Mariner"));
+        skills.Insert(13, objectManager.GetObject<SkillObject>("Boatswain"));
+        skills.Insert(20, objectManager.GetObject<SkillObject>("Shipmaster"));
+        return skills;
     }
 
     public static List<PerkObject> GetPerksForSkillInRange(SkillObject skill, int minLevel, int maxLevel)

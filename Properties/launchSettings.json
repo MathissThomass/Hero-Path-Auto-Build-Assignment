@@ -14,6 +14,13 @@
       "workingDirectory": "$(GameFolder)\\bin\\$(GameBinariesFolder)"
     },
 
+    "BLSE Bannerlord_without_WarSails": {
+      "commandName": "Executable",
+      "executablePath": "$(GameFolder)\\bin\\$(GameBinariesFolder)\\Bannerlord.BLSE.Standalone.exe",
+      "commandLineArgs": "/disableautogenexceptions /singleplayer _MODULES_*Bannerlord.Harmony*Bannerlord.UIExtenderEx*Native*SandBoxCore*CustomBattle*Sandbox*StoryMode*$(ModuleId)*_MODULES_",
+      "workingDirectory": "$(GameFolder)\\bin\\$(GameBinariesFolder)"
+    },
+
     "BLSE Bannerlord With Crash Reporter": {
       "commandName": "Executable",
       "executablePath": "$(GameFolder)\\bin\\$(GameBinariesFolder)\\Bannerlord.BLSE.Standalone.exe",

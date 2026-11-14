@@ -16,6 +16,8 @@ public class TemplateManagerSkillGridVM : ViewModel
     private TemplateManagerSkillVM _currentSkillVM;
 
     private bool _isImportantSkillToggleOn;
+    private readonly bool _useWarSailsSkillGrid;
+    private readonly bool _useVanillaSkillGrid;
     
     Action<TemplateManagerCharacter> _onSaveTemplate;
 
@@ -23,9 +25,17 @@ public class TemplateManagerSkillGridVM : ViewModel
     {
         TemplateCharacter = templateCharacter;
         _skillsVM = new MBBindingList<TemplateManagerSkillVM>();
+        _useWarSailsSkillGrid = CharacterUtils.IsWarSailsActive();
+        _useVanillaSkillGrid = !_useWarSailsSkillGrid;
         _onSaveTemplate = onSaveTemplate;
         RefreshHeroSkills();
     }
+
+    [DataSourceProperty]
+    public bool UseWarSailsSkillGrid => _useWarSailsSkillGrid;
+
+    [DataSourceProperty]
+    public bool UseVanillaSkillGrid => _useVanillaSkillGrid;
 
     [DataSourceProperty]
     public MBBindingList<TemplateManagerSkillVM> SkillsVM

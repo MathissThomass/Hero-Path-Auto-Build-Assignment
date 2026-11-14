@@ -48,6 +48,8 @@ public class TemplateListVM : ViewModel
 
         if (ListItemVM.Count > 0)
         {
+            inspectedIndex = Math.Max(0, Math.Min(inspectedIndex, ListItemVM.Count - 1));
+            
             ListItemVM[inspectedIndex].IsInspected = true;
             _currentTemplateListItemVM = ListItemVM[inspectedIndex];
         }

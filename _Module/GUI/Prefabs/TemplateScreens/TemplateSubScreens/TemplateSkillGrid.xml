@@ -74,19 +74,36 @@
                     </Children>
                 </ListPanel>
 
-                <!-- Skill grid -->
+                <!-- Skill grid. 7 columns with War Sails, 6 without, so the vanilla skills stay in their columns. -->
                 <Widget HeightSizePolicy="CoverChildren" WidthSizePolicy="CoverChildren" HorizontalAlignment="Right"
                         VerticalAlignment="Bottom" UpdateChildrenStates="true" MarginRight="8" MarginBottom="10">
                     <Children>
 
-                        <GridWidget DataSource="{SkillsVM}" WidthSizePolicy="CoverChildren" MarginTop="8"
-                                    HeightSizePolicy="CoverChildren" DefaultCellWidth="178" DefaultCellHeight="138"
-                                    ColumnCount="7" MarginLeft="11.558">
-                            <ItemTemplate>
-                                <TemplateSkillGridItem VerticalAlignment="Top" HorizontalAlignment="Center"
-                                                       Parameter.HasExtraSkills="true"/>
-                            </ItemTemplate>
-                        </GridWidget>
+                        <Widget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" IsVisible="@UseWarSailsSkillGrid">
+                            <Children>
+                                <GridWidget DataSource="{SkillsVM}" WidthSizePolicy="CoverChildren" MarginTop="8"
+                                            HeightSizePolicy="CoverChildren" DefaultCellWidth="178" DefaultCellHeight="138"
+                                            ColumnCount="7" MarginLeft="11.558">
+                                    <ItemTemplate>
+                                        <TemplateSkillGridItem VerticalAlignment="Top" HorizontalAlignment="Center"
+                                                               Parameter.HasExtraSkills="true"/>
+                                    </ItemTemplate>
+                                </GridWidget>
+                            </Children>
+                        </Widget>
+
+                        <Widget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" IsVisible="@UseVanillaSkillGrid">
+                            <Children>
+                                <GridWidget DataSource="{SkillsVM}" WidthSizePolicy="CoverChildren" MarginTop="8"
+                                            HeightSizePolicy="CoverChildren" DefaultCellWidth="178" DefaultCellHeight="138"
+                                            ColumnCount="6" MarginLeft="11.558">
+                                    <ItemTemplate>
+                                        <TemplateSkillGridItem VerticalAlignment="Top" HorizontalAlignment="Center"
+                                                               Parameter.HasExtraSkills="true"/>
+                                    </ItemTemplate>
+                                </GridWidget>
+                            </Children>
+                        </Widget>
 
                     </Children>
                 </Widget>
