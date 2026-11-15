@@ -11,6 +11,7 @@ public class AutoAssignBehavior : CampaignBehaviorBase
     public override void RegisterEvents()
     {
         CampaignEvents.HeroGainedSkill.AddNonSerializedListener(this, OnHeroGainedSkill);
+        CampaignEvents.HeroLevelledUp.AddNonSerializedListener(this, OnHeroLevelledUp);
         CampaignEvents.OnGameLoadFinishedEvent.AddNonSerializedListener(this, OnGameLoadFinished);
         CampaignEvents.HeroKilledEvent.AddNonSerializedListener(this, OnHeroDied);
     }
@@ -40,7 +41,21 @@ public class AutoAssignBehavior : CampaignBehaviorBase
                 var initialLvl = skillLvl - change;
                 AutoAssign.AutoAssignPerkPoint(hero, heroTemplate, skill, initialLvl);
             }
-            
+        }
+    }
+
+    private static void OnHeroLevelledUp(Hero hero, bool shouldNotify = true)
+    {
+        if (hero.Clan == Clan.PlayerClan)
+        {
+            var templateList = TemplateStore.Instance.TemplateList;
+            var heroTemplate = CharacterUtils.FindHeroAssignedTemplate(hero, templateList);
+
+            if (heroTemplate == null)
+            {
+                return;
+            }
+
             if (hero.HeroDeveloper.UnspentAttributePoints > 0)
             {
                 AutoAssign.AutoAssignAttributPoint(hero, heroTemplate);
@@ -58,12 +73,14 @@ public class AutoAssignBehavior : CampaignBehaviorBase
         TemplateStore.Instance.LoadFromDisk();
     }
 
-    private static void OnHeroDied(Hero victim, Hero killer, KillCharacterAction.KillCharacterActionDetail deathDetail, bool showNotification)
+    private static void OnHeroDied(Hero victim, Hero killer, KillCharacterAction.KillCharacterActionDetail deathDetail,
+        bool showNotification)
     {
         if (victim.Clan != Clan.PlayerClan)
         {
             return;
         }
+
         TemplateSaveManager.RemoveHeroFromTemplate(victim);
     }
 }
