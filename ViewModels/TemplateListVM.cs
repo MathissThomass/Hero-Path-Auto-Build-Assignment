@@ -4,6 +4,7 @@ using System.Linq;
 using HeroPathAutoBuildAssignment.Models;
 using HeroPathAutoBuildAssignment.Utils;
 using Newtonsoft.Json;
+using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
@@ -100,7 +101,20 @@ public class TemplateListVM : ViewModel
     private void ExecuteDuplicateCurrentTemplate()
     {
         var original = _currentTemplateListItemVM._templateManagerCharacter;
-        var json = JsonConvert.SerializeObject(original);
+        
+        var originalHeroList = original.HeroList;
+        string json;
+
+        try
+        {
+            original.HeroList = new List<Hero>();
+            json = JsonConvert.SerializeObject(original);
+        }
+        finally
+        {
+            original.HeroList = originalHeroList;
+        }
+        
         var newTemplate = JsonConvert.DeserializeObject<TemplateManagerCharacter>(json);
         newTemplate.Name = GenerateUniqueName("Duplicate " + newTemplate.Name);
         newTemplate.CreateNewTemplate();
