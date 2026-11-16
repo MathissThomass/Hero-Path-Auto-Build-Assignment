@@ -21,5 +21,7 @@
         <string id="delete_template_inquiry_text" text="Are you sure you want to delete the current template?" />
         <string id="unsaved_inquiry_title" text="There is some unsaved template" />
         <string id="unsaved_inquiry_text" text="Are you sure you want to continue?" />
+        <string id="templates_force_apply" text="Apply Template" />
+        <string id="templates_force_apply_hint" text="Applies the hero assigned template by automatically assigning available attribute, focus points and perks. Existing assignments will not be changed.{newline}Use This button if automatic assignment stops working or after resetting attributes, focus points or perks with another mod." />
     </strings>
 </base>

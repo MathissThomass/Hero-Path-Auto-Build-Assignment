@@ -21,5 +21,7 @@
         <string id="delete_template_inquiry_text" text="Êtes-vous sûr de vouloir supprimer ce modèle?" />
         <string id="unsaved_inquiry_title" text="Il y a des modifications non enregistrées" />
         <string id="unsaved_inquiry_text" text="Êtes-vous sûr de vouloir continuer?" />
+        <string id="templates_force_apply" text="Appliquer le modèle" />
+        <string id="templates_force_apply_hint" text="Applique le modèle attribué au héro en assignant automatiquement les attributs, les focus et les avantages. Les attributions existantes ne sont pas modifiées.{newline}Utiliser si l'assignement automatique n'a pas fonctionné ou après une réinitialisation des attributs, focus ou atouts avec un autre mod" />
     </strings>
 </base>
