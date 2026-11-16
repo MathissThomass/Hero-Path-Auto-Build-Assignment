@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using Bannerlord.UIExtenderEx.Attributes;
+﻿using Bannerlord.UIExtenderEx.Attributes;
 using Bannerlord.UIExtenderEx.ViewModels;
 using HeroPathAutoBuildAssignment.Behaviors;
 using HeroPathAutoBuildAssignment.Data;
@@ -19,15 +17,13 @@ internal class CharacterDeveloperVmMixin : BaseViewModelMixin<CharacterDeveloper
 {
     private readonly CharacterDeveloperVM _vm;
     private bool _canApplyTemplate = false;
-    private static readonly ConditionalWeakTable<CharacterDeveloperVM, CharacterDeveloperVmMixin>
-        Mixins = new();
 
 
     public CharacterDeveloperVmMixin(CharacterDeveloperVM vm) : base(vm)
     {
         _vm = vm;
     }
-    
+
     protected override void OnViewModelPropertyChanged(string propertyName)
     {
         base.OnViewModelPropertyChanged(propertyName);
@@ -37,6 +33,7 @@ internal class CharacterDeveloperVmMixin : BaseViewModelMixin<CharacterDeveloper
             UpdateCanApplyTemplate();
         }
     }
+
     private void UpdateCanApplyTemplate()
     {
         var currentHero = _vm.CurrentCharacter?.Hero;
@@ -48,7 +45,7 @@ internal class CharacterDeveloperVmMixin : BaseViewModelMixin<CharacterDeveloper
             var heroTemplate = CharacterUtils.FindHeroAssignedTemplate(currentHero, templateList);
             canApply = heroTemplate != null;
         }
-            
+
         if (_canApplyTemplate != canApply)
         {
             _canApplyTemplate = canApply;
@@ -79,25 +76,27 @@ internal class CharacterDeveloperVmMixin : BaseViewModelMixin<CharacterDeveloper
     {
         var currentHero = _vm.CurrentCharacter?.Hero;
         var templateList = TemplateStore.Instance.TemplateList;
-        
+
         if (currentHero == null)
         {
             return;
         }
-        
+
         var heroTemplate = CharacterUtils.FindHeroAssignedTemplate(currentHero, templateList);
 
         if (heroTemplate == null)
         {
             return;
         }
+
         AutoAssign.CatchUpAssignedHero(currentHero, heroTemplate);
 
         _vm.RefreshValues();
     }
-    
+
     [DataSourceProperty]
-    public bool CanApplyTemplate {
+    public bool CanApplyTemplate
+    {
         get { return _canApplyTemplate; }
         set
         {
@@ -108,13 +107,15 @@ internal class CharacterDeveloperVmMixin : BaseViewModelMixin<CharacterDeveloper
             }
         }
     }
-    
+
     [DataSourceProperty]
     public string TitleTemplateText { get; set; } = new TextObject("{=templates_title}Templates").ToString();
-    
+
     [DataSourceProperty]
-    public string ForceApplyTemplateText { get; set; } = new TextObject("{=templates_force_apply}Apply Template").ToString();
- 
+    public string ForceApplyTemplateText { get; set; } =
+        new TextObject("{=templates_force_apply}Apply Template").ToString();
+
     [DataSourceProperty]
-    public HintViewModel ApplyTemplateHint  {get;set;} = new HintViewModel(new TextObject("{=templates_force_apply_hint}Applies the hero assigned template by automatically assigning available attribute, focus points and perks. Existing assignments will not be changed.{newline}Use This button if automatic assignment stops working or after resetting attributes, focus points or perks with another mod."));
+    public HintViewModel ApplyTemplateHint { get; set; } = new HintViewModel(new TextObject(
+        "{=templates_force_apply_hint}Applies the hero assigned template by automatically assigning available attribute, focus points and perks. Existing assignments will not be changed.{newline}Use This button if automatic assignment stops working or after resetting attributes, focus points or perks with another mod."));
 }

@@ -24,16 +24,9 @@ public class TemplateSaveManager
         return cleaned;
     }
 
-    private static string GetModFolder()
-    {
-        var asmPath = Assembly.GetExecutingAssembly().Location;
-        return Path.GetDirectoryName(asmPath);
-    }
-
     private static string GetSavesFolder()
     {
-        var modFolder = GetModFolder();
-        var savesFolder = Path.Combine(modFolder, SavesFolderName);
+        var savesFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Mount and Blade II Bannerlord", "Configs", "Hero's Path", "SavedTemplates");
         if (!Directory.Exists(savesFolder)) Directory.CreateDirectory(savesFolder);
         return savesFolder;
     }
