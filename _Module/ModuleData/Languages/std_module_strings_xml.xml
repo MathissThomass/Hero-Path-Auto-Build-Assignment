@@ -23,5 +23,12 @@
         <string id="unsaved_inquiry_text" text="Are you sure you want to continue?" />
         <string id="templates_force_apply" text="Apply Template" />
         <string id="templates_force_apply_hint" text="Applies the hero assigned template by automatically assigning available attribute, focus points and perks. Existing assignments will not be changed.{newline}Use This button if automatic assignment stops working or after resetting attributes, focus points or perks with another mod." />
+
+        <!-- Settings string-->
+        <string id="attribut_automatic_assignment_option_title" text="Attributes automatic assignment" />
+        <string id="focus_automatic_assignment_option_title" text="Focus automatic assignment" />
+        <string id="attribut_automatic_assignment_option_hint" text="Should Hero's Path automatically assign the Attributes point for the heroes you assigned a template?" />
+        <string id="focus_automatic_assignment_option_hint" text="Should Hero's Path automatically assign the Focus point for the heroes you assigned a template?" />
+
     </strings>
 </base>

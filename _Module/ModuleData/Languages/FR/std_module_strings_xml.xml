@@ -23,5 +23,11 @@
         <string id="unsaved_inquiry_text" text="Êtes-vous sûr de vouloir continuer?" />
         <string id="templates_force_apply" text="Appliquer le modèle" />
         <string id="templates_force_apply_hint" text="Applique le modèle attribué au héro en assignant automatiquement les attributs, les focus et les avantages. Les attributions existantes ne sont pas modifiées.{newline}Utiliser si l'assignement automatique n'a pas fonctionné ou après une réinitialisation des attributs, focus ou atouts avec un autre mod" />
+
+        <!-- Settings string-->
+        <string id="attribut_automatic_assignment_option_title" text="Assignement automatic des Attributs" />
+        <string id="focus_automatic_assignment_option_title" text="Assignement automatic des Focus" />
+        <string id="attribut_automatic_assignment_option_hint" text="Est ce que Hero's Path devrait assigner automatiquement les points d'attributs pour les héros avec un Template attribuer?" />
+        <string id="focus_automatic_assignment_option_hint" text="Est ce que Hero's Path devrait assigner automatiquement les points de focus pour les héros avec un Template attribuer?" />
     </strings>
 </base>
