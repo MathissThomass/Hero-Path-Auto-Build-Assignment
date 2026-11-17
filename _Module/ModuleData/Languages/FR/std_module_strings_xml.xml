@@ -27,7 +27,7 @@
         <!-- Settings string-->
         <string id="attribut_automatic_assignment_option_title" text="Assignement automatic des Attributs" />
         <string id="focus_automatic_assignment_option_title" text="Assignement automatic des Focus" />
-        <string id="attribut_automatic_assignment_option_hint" text="Est ce que Hero's Path devrait assigner automatiquement les points d'attributs pour les héros avec un Template attribuer?" />
-        <string id="focus_automatic_assignment_option_hint" text="Est ce que Hero's Path devrait assigner automatiquement les points de focus pour les héros avec un Template attribuer?" />
+        <string id="attribut_automatic_assignment_option_hint" text="Est ce que Hero's Path devrait assigner automatiquement les points d'attributs pour les héros avec un modèle attribuer?" />
+        <string id="focus_automatic_assignment_option_hint" text="Est ce que Hero's Path devrait assigner automatiquement les points de focus pour les héros avec un modèle attribuer?" />
     </strings>
 </base>

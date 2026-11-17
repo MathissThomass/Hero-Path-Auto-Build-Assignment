@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using HeroPathAutoBuildAssignment.Models;
+using HeroPathAutoBuildAssignment.Settings;
 using HeroPathAutoBuildAssignment.Utils;
+using MCM.Abstractions.Base.Global;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.Core;
@@ -165,6 +167,7 @@ public class AutoAssign
         var perkInTemplateToAdd = PerkObject.All
             .Where(perkObject => unlockedPerkIdInTemplate.Contains(perkObject.StringId))
             .ToList();
+        var settings = GlobalSettings<HeroPathSettings>.Instance;
 
         foreach (var perk in from perk in perkInTemplateToAdd
                  let perkValue = hero.GetPerkValue(perk)
@@ -175,6 +178,11 @@ public class AutoAssign
             hero.HeroDeveloper.AddPerk(ChoosePerkRespectingCaps(hero, perk));
         }
 
+        if (settings is { UnSelectedPerkRandomAssignment: false })
+        {
+            return;
+        }
+        
         var perkToRandomize = unlockedPerks.Except(perkInTemplateToAdd);
         foreach (var perk in perkToRandomize)
         {

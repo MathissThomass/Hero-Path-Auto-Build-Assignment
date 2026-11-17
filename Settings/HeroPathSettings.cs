@@ -13,6 +13,7 @@ internal sealed class  HeroPathSettings : AttributeGlobalSettings<HeroPathSettin
 
     private bool _attributAutomaticAssignment = true;
     private bool _focusAutomaticAssignment = true;
+    private bool _unSelectedPerkRandomAssignment = true;
 
 
     [SettingPropertyBool("{=attribut_automatic_assignment_option_title}Attributes automatic assignment",
@@ -47,6 +48,24 @@ internal sealed class  HeroPathSettings : AttributeGlobalSettings<HeroPathSettin
             {
                 _focusAutomaticAssignment = value;
                 OnPropertyChanged("FocusAutomaticAssignment");
+            }
+        }
+    }
+    
+    [SettingPropertyBool("{=unselected_perk_random_assignment_option_title}Unselected Perk random assignment",
+        Order = 2,
+        RequireRestart = false,
+        HintText = "{=unassigned_perk_random_assignment_option_hint}Should Hero's Path choose a random assignment for the unselected perk in the template?")]
+    [SettingPropertyGroup("General")]
+    public bool UnSelectedPerkRandomAssignment
+    {
+        get => _unSelectedPerkRandomAssignment;
+        set
+        {
+            if (value != _unSelectedPerkRandomAssignment)
+            {
+                _unSelectedPerkRandomAssignment = value;
+                OnPropertyChanged("UnSelectedPerkRandomAssignment");
             }
         }
     }

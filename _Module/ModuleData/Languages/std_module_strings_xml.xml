@@ -29,6 +29,7 @@
         <string id="focus_automatic_assignment_option_title" text="Focus automatic assignment" />
         <string id="attribut_automatic_assignment_option_hint" text="Should Hero's Path automatically assign the Attributes point for the heroes you assigned a template?" />
         <string id="focus_automatic_assignment_option_hint" text="Should Hero's Path automatically assign the Focus point for the heroes you assigned a template?" />
-
+        <string id="unselected_perk_random_assignment_option_title" text="Unselected Perk random assignment" />
+        <string id="unassigned_perk_random_assignment_option_hint" text="Should Hero's Path choose a random assignment for the unselected perk in the template?" />
     </strings>
 </base>
