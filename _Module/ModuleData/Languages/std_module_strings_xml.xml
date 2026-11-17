@@ -5,7 +5,7 @@
     </tags>
     <strings>
         <string id="templates_title" text="Templates" />
-        <string id="is_important_skill_text" text="Priority skill" />
+        <string id="important_skill_text" text="Priority skill" />
         <string id="clear_all_perks_text" text="Clear all perks" />
         <string id="clear_all_skill_perk_text" text="Clear all skill perks" />
         <string id="template_list_title" text="Template list" />
