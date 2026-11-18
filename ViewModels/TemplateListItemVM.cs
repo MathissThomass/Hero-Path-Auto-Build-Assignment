@@ -47,8 +47,8 @@ public class TemplateListItemVM : ViewModel
         var skillList = CharacterUtils.GetSkillsWithWarSails();
         foreach (var skill in skillList)
         {
-            var isImportantSkill = templateManagerCharacter.GetImportantSkill(skill);
-            SkillsVm.Add(new TemplateSkillOverviewVM(skill, isImportantSkill));
+            var skillPriority = templateManagerCharacter.GetSkillPriority(skill);
+            SkillsVm.Add(new TemplateSkillOverviewVM(skill, skillPriority));
         }
 
         OnPropertyChanged("SkillsVm");

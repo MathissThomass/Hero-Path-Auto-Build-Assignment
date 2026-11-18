@@ -1,5 +1,7 @@
 ﻿using HeroPathAutoBuildAssignment.Data;
+using HeroPathAutoBuildAssignment.Settings;
 using HeroPathAutoBuildAssignment.Utils;
+using MCM.Abstractions.Base.Global;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Core;
@@ -50,18 +52,19 @@ public class AutoAssignBehavior : CampaignBehaviorBase
         {
             var templateList = TemplateStore.Instance.TemplateList;
             var heroTemplate = CharacterUtils.FindHeroAssignedTemplate(hero, templateList);
+            var settings = GlobalSettings<HeroPathSettings>.Instance;
 
-            if (heroTemplate == null)
+            if (heroTemplate == null || settings == null)
             {
                 return;
             }
-
-            if (hero.HeroDeveloper.UnspentAttributePoints > 0)
+            
+            if (settings.AttributAutomaticAssignment && hero.HeroDeveloper.UnspentAttributePoints > 0)
             {
                 AutoAssign.AutoAssignAttributPoint(hero, heroTemplate);
             }
 
-            if (hero.HeroDeveloper.UnspentFocusPoints > 0)
+            if (settings.FocusAutomaticAssignment && hero.HeroDeveloper.UnspentFocusPoints > 0)
             {
                 AutoAssign.AutoAssignFocusPoint(hero, heroTemplate);
             }
@@ -70,6 +73,7 @@ public class AutoAssignBehavior : CampaignBehaviorBase
 
     private static void OnGameLoadFinished()
     {
+        TemplateSaveManager.ConvertLegacySkillPriorities();
         TemplateStore.Instance.LoadFromDisk();
     }
 

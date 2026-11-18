@@ -117,7 +117,7 @@ public class TemplateListVM : ViewModel
         
         var newTemplate = JsonConvert.DeserializeObject<TemplateManagerCharacter>(json);
         newTemplate.Name = GenerateUniqueName("Duplicate " + newTemplate.Name);
-        newTemplate.CreateNewTemplate();
+        newTemplate.UpdateSavedStateSnapshot();
         _templateManagerCharacterList.Add(newTemplate);
         var index = _templateManagerCharacterList.Count - 1;
         RefreshTemplateList(index);

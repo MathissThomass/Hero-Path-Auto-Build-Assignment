@@ -20,8 +20,8 @@
                                                MarginLeft="2">
                             <Children>
                                 <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="20"
-                                            Text="@IsImportantSkillText" VerticalAlignment="Center" Brush="Encyclopedia.Skill.Text"
-                                            Brush.FontSize="20" Brush.FontColor="#FCB066FF" IsVisible="@ImportantSkill"/>
+                                            Text="@SkillPriorityText" VerticalAlignment="Center" Brush="Encyclopedia.Skill.Text"
+                                            Brush.FontSize="20" Brush.FontColor="#FCB066FF" IsVisible="@HasSkillPriority"/>
 
                                 <HintWidget DataSource="{Hint}" HeightSizePolicy="StretchToParent"
                                             WidthSizePolicy="StretchToParent" Command.HoverBegin="ExecuteBeginHint"
@@ -44,8 +44,8 @@
                                                MarginLeft="2">
                             <Children>
                                 <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="20"
-                                            Text="@IsImportantSkillText" VerticalAlignment="Center" Brush="Encyclopedia.Skill.Text"
-                                            Brush.FontSize="20" Brush.FontColor="#FCB066FF" IsVisible="@ImportantSkill"/>
+                                            Text="@SkillPriorityText" VerticalAlignment="Center" Brush="Encyclopedia.Skill.Text"
+                                            Brush.FontSize="20" Brush.FontColor="#FCB066FF" IsVisible="@HasSkillPriority"/>
 
                                 <HintWidget DataSource="{Hint}" HeightSizePolicy="StretchToParent"
                                             WidthSizePolicy="StretchToParent" Command.HoverBegin="ExecuteBeginHint"

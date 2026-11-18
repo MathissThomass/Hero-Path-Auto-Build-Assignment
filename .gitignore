@@ -98,3 +98,6 @@ ipch/
 # Build outputs
 bin/
 obj/
+
+# Continue
+.continue

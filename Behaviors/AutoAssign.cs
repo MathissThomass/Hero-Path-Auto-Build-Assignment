@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using HeroPathAutoBuildAssignment.Models;
+using HeroPathAutoBuildAssignment.Settings;
 using HeroPathAutoBuildAssignment.Utils;
+using MCM.Abstractions.Base.Global;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.Core;
@@ -12,13 +14,7 @@ namespace HeroPathAutoBuildAssignment.Behaviors;
 public class AutoAssign
 {
     private static readonly Random _rng = new Random();
-    private const double ImportantMultiplier = 1.25;
-    private const double SpecialSkillNotImportantMultiplier = 0.6;
-    private const double SpecialSkillImportantMultiplier = 1.4;
     private const double LearningRateCapMultiplier = 9.0;
-
-    private static readonly HashSet<string> SpecialSkillIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        { DefaultSkills.Steward.StringId, DefaultSkills.Medicine.StringId, DefaultSkills.Engineering.StringId };
 
     
     public static void AutoAssignFocusPoint(Hero hero, TemplateManagerCharacter template)
@@ -44,15 +40,11 @@ public class AutoAssign
                     continue;
                 }
 
-                var isImportant = templateSkill.IsSkillImportant;
+                var skillPriority = templateSkill.SkillPriority;
                 var learningRate = CharacterUtils.GetLearningRate(hero, skill);
 
                 var baseWeight = 1.0 / learningRate;
-                var mult = isImportant ? ImportantMultiplier : 1.0;
-                if (SpecialSkillIds.Contains(skill.StringId))
-                {
-                    mult = isImportant ? SpecialSkillImportantMultiplier : SpecialSkillNotImportantMultiplier;
-                }
+                var mult = 1.0 + skillPriority;
                 double weight = baseWeight;
                 var learningRateAfterApplyFocus = CharacterUtils.GetLearningRate(hero, skill, 1);
                 if ( learningRateAfterApplyFocus > LearningRateCapMultiplier)
@@ -96,15 +88,11 @@ public class AutoAssign
                     continue;
                 }
 
-                var isImportant = templateSkill.IsSkillImportant;
+                var skillPriority = templateSkill.SkillPriority;
                 var learningRate = CharacterUtils.GetLearningRate(hero, skill);
 
                 var baseWeight = 1.0 / learningRate;
-                var mult = isImportant ? ImportantMultiplier : 1.0;
-                if (SpecialSkillIds.Contains(skill.StringId))
-                {
-                    mult = isImportant ? SpecialSkillImportantMultiplier : SpecialSkillNotImportantMultiplier;
-                }
+                var mult = 1.0 + skillPriority;
                 double weight = baseWeight * mult;
 
                 weightList[skill] = weight;
@@ -165,6 +153,7 @@ public class AutoAssign
         var perkInTemplateToAdd = PerkObject.All
             .Where(perkObject => unlockedPerkIdInTemplate.Contains(perkObject.StringId))
             .ToList();
+        var settings = GlobalSettings<HeroPathSettings>.Instance;
 
         foreach (var perk in from perk in perkInTemplateToAdd
                  let perkValue = hero.GetPerkValue(perk)
@@ -175,6 +164,11 @@ public class AutoAssign
             hero.HeroDeveloper.AddPerk(ChoosePerkRespectingCaps(hero, perk));
         }
 
+        if (settings is { UnSelectedPerkRandomAssignment: false })
+        {
+            return;
+        }
+        
         var perkToRandomize = unlockedPerks.Except(perkInTemplateToAdd);
         foreach (var perk in perkToRandomize)
         {

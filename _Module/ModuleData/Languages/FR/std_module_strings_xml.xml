@@ -5,7 +5,7 @@
     </tags>
     <strings>
         <string id="templates_title" text="Modèles" />
-        <string id="important_skill_text" text="Compétence prioritaire" />
+        <string id="set_skill_priority_text" text="Définir la priorité de cette compétence :" />
         <string id="clear_all_perks_text" text="Réinitialiser tous les atouts" />
         <string id="clear_all_skill_perk_text" text="Réinitialiser les atouts de la compétence" />
         <string id="template_list_title" text="Liste des modèles" />
@@ -23,5 +23,11 @@
         <string id="unsaved_inquiry_text" text="Êtes-vous sûr de vouloir continuer?" />
         <string id="templates_force_apply" text="Appliquer le modèle" />
         <string id="templates_force_apply_hint" text="Applique le modèle attribué au héro en assignant automatiquement les attributs, les focus et les avantages. Les attributions existantes ne sont pas modifiées.{newline}Utiliser si l'assignement automatique n'a pas fonctionné ou après une réinitialisation des attributs, focus ou atouts avec un autre mod" />
+        
+        <!-- Settings string-->
+        <string id="attribut_automatic_assignment_option_title" text="Assignement automatic des Attributs" />
+        <string id="focus_automatic_assignment_option_title" text="Assignement automatic des Focus" />
+        <string id="attribut_automatic_assignment_option_hint" text="Est ce que Hero's Path devrait assigner automatiquement les points d'attributs pour les héros avec un modèle attribuer?" />
+        <string id="focus_automatic_assignment_option_hint" text="Est ce que Hero's Path devrait assigner automatiquement les points de focus pour les héros avec un modèle attribuer?" />
     </strings>
 </base>
