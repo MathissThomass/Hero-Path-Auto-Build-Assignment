@@ -29,35 +29,45 @@ public class TemplateManagerCharacter
     }
 
 
-    public void SetImportantSkill(SkillObject skill, bool isImportant)
+    public void SetSkillPriority(SkillObject skill, float skillPriority)
     {
-        TemplateManagerCharacterSkill? result = SkillList.FirstOrDefault((obj) => obj.StringId.Equals(skill.StringId));
-        if (result != null)
-        {
-            result.IsSkillImportant = isImportant;
-        }
+        SetSkillPriority(skill.StringId, skillPriority);
     }
 
-    public void SetImportantSkill(string skillId, bool isImportant)
+    public void SetSkillPriority(string skillId, float skillPriority)
     {
         TemplateManagerCharacterSkill? result = SkillList.FirstOrDefault(obj => obj.StringId.Equals(skillId));
         if (result != null)
         {
-            result.IsSkillImportant = isImportant;
+            result.SkillPriority = ClampSkillPriority(skillPriority);
         }
     }
 
-    public bool GetImportantSkill(SkillObject skill)
+    public float GetSkillPriority(SkillObject skill)
     {
         TemplateManagerCharacterSkill? result = SkillList.FirstOrDefault((obj) => obj.StringId.Equals(skill.StringId));
         if (result != null)
         {
-            return result.IsSkillImportant;
+            return result.SkillPriority;
         }
-        else
+
+        return 0f;
+    }
+
+    public static float ClampSkillPriority(float skillPriority)
+    {
+        var rounded = TaleWorlds.Library.MathF.Round(skillPriority, 1);
+        if (rounded < -1f)
         {
-            return false;
+            return -1f;
         }
+
+        if (rounded > 1f)
+        {
+            return 1f;
+        }
+
+        return rounded;
     }
 
     public void ClearPerkSkill(SkillObject skill)
@@ -131,7 +141,7 @@ public class TemplateManagerCharacter
         foreach (var skill in listSkills)
         {
             var pid = skill.StringId ?? skill.GetType().Name;
-            var skillEntry = new TemplateManagerCharacterSkill(skill, pid, false);
+            var skillEntry = new TemplateManagerCharacterSkill(skill, pid, 0f);
             SkillList.Add(skillEntry);
         }
     }

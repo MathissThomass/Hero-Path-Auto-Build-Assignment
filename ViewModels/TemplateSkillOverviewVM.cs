@@ -1,4 +1,5 @@
-﻿using TaleWorlds.Core;
+﻿using HeroPathAutoBuildAssignment.Models;
+using TaleWorlds.Core;
 using TaleWorlds.Core.ViewModelCollection.Information;
 using TaleWorlds.Library;
 
@@ -6,14 +7,14 @@ namespace HeroPathAutoBuildAssignment.ViewModels;
 
 public class TemplateSkillOverviewVM : ViewModel
 {
-    private bool _isImportantSkill;
+    private float _skillPriority;
     private string _skillId;
     private SkillObject _skill;
     private BasicTooltipViewModel _hint;
 
-    public TemplateSkillOverviewVM(SkillObject skillObject, bool isImportantSkill)
+    public TemplateSkillOverviewVM(SkillObject skillObject, float skillPriority)
     {
-        _isImportantSkill = isImportantSkill;
+        _skillPriority = TemplateManagerCharacter.ClampSkillPriority(skillPriority);
         _skillId = skillObject.StringId;
         _skill = skillObject;
         RefreshValues();
@@ -33,17 +34,15 @@ public class TemplateSkillOverviewVM : ViewModel
     }
 
     [DataSourceProperty]
-    public bool IsImportantSkill
+    public string SkillPriorityText
     {
-        get { return _isImportantSkill; }
-        set
-        {
-            if (value != _isImportantSkill)
-            {
-                _isImportantSkill = value;
-                OnPropertyChangedWithValue(value, "IsImportantSkill");
-            }
-        }
+        get { return _skillPriority.ToString("0.##"); }
+    }
+
+    [DataSourceProperty]
+    public bool HasSkillPriority
+    {
+        get { return _skillPriority != 0f; }
     }
 
     [DataSourceProperty]

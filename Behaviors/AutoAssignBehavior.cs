@@ -73,6 +73,7 @@ public class AutoAssignBehavior : CampaignBehaviorBase
 
     private static void OnGameLoadFinished()
     {
+        TemplateSaveManager.ConvertLegacySkillPriorities();
         TemplateStore.Instance.LoadFromDisk();
     }
 

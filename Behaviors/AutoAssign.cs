@@ -14,13 +14,7 @@ namespace HeroPathAutoBuildAssignment.Behaviors;
 public class AutoAssign
 {
     private static readonly Random _rng = new Random();
-    private const double ImportantMultiplier = 1.25;
-    private const double SpecialSkillNotImportantMultiplier = 0.6;
-    private const double SpecialSkillImportantMultiplier = 1.4;
     private const double LearningRateCapMultiplier = 9.0;
-
-    private static readonly HashSet<string> SpecialSkillIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        { DefaultSkills.Steward.StringId, DefaultSkills.Medicine.StringId, DefaultSkills.Engineering.StringId };
 
     
     public static void AutoAssignFocusPoint(Hero hero, TemplateManagerCharacter template)
@@ -46,15 +40,11 @@ public class AutoAssign
                     continue;
                 }
 
-                var isImportant = templateSkill.IsSkillImportant;
+                var skillPriority = templateSkill.SkillPriority;
                 var learningRate = CharacterUtils.GetLearningRate(hero, skill);
 
                 var baseWeight = 1.0 / learningRate;
-                var mult = isImportant ? ImportantMultiplier : 1.0;
-                if (SpecialSkillIds.Contains(skill.StringId))
-                {
-                    mult = isImportant ? SpecialSkillImportantMultiplier : SpecialSkillNotImportantMultiplier;
-                }
+                var mult = 1.0 + skillPriority;
                 double weight = baseWeight;
                 var learningRateAfterApplyFocus = CharacterUtils.GetLearningRate(hero, skill, 1);
                 if ( learningRateAfterApplyFocus > LearningRateCapMultiplier)
@@ -98,15 +88,11 @@ public class AutoAssign
                     continue;
                 }
 
-                var isImportant = templateSkill.IsSkillImportant;
+                var skillPriority = templateSkill.SkillPriority;
                 var learningRate = CharacterUtils.GetLearningRate(hero, skill);
 
                 var baseWeight = 1.0 / learningRate;
-                var mult = isImportant ? ImportantMultiplier : 1.0;
-                if (SpecialSkillIds.Contains(skill.StringId))
-                {
-                    mult = isImportant ? SpecialSkillImportantMultiplier : SpecialSkillNotImportantMultiplier;
-                }
+                var mult = 1.0 + skillPriority;
                 double weight = baseWeight * mult;
 
                 weightList[skill] = weight;

@@ -5,7 +5,7 @@
     </tags>
     <strings>
         <string id="templates_title" text="Templates" />
-        <string id="important_skill_text" text="Priority skill" />
+        <string id="set_skill_priority_text" text="Set the priority of this skill :" />
         <string id="clear_all_perks_text" text="Clear all perks" />
         <string id="clear_all_skill_perk_text" text="Clear all skill perks" />
         <string id="template_list_title" text="Template list" />
@@ -23,7 +23,7 @@
         <string id="unsaved_inquiry_text" text="Are you sure you want to continue?" />
         <string id="templates_force_apply" text="Apply Template" />
         <string id="templates_force_apply_hint" text="Applies the hero assigned template by automatically assigning available attribute, focus points and perks. Existing assignments will not be changed.{newline}Use This button if automatic assignment stops working or after resetting attributes, focus points or perks with another mod." />
-
+        
         <!-- Settings string-->
         <string id="attribut_automatic_assignment_option_title" text="Attributes automatic assignment" />
         <string id="focus_automatic_assignment_option_title" text="Focus automatic assignment" />

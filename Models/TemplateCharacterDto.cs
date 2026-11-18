@@ -7,7 +7,7 @@ namespace HeroPathAutoBuildAssignment.Models;
 public class TemplateCharacterDto
 {
     public string Name { get; set; }
-    public List<string> ImportantSkillIdList { get; set; }
+    public Dictionary<string, float> SkillPriorityById { get; set; }
     public List<string> EnabledPerkIdList { get; set; }
     public List<string> HeroIdList { get; set; }
 
@@ -16,21 +16,18 @@ public class TemplateCharacterDto
         return new TemplateCharacterDto
         {
             Name = model.Name,
-            ImportantSkillIdList = GetImportantSkillIdsFromList(model.SkillList),
+            SkillPriorityById = GetSkillPrioritiesFromList(model.SkillList),
             EnabledPerkIdList = GetEnabledPerkIdsFromList(model.PerkList),
             HeroIdList = GetHeroIdsFromList(model.HeroList),
         };
     }
 
-    private static List<string> GetImportantSkillIdsFromList(List<TemplateManagerCharacterSkill> skillList)
+    private static Dictionary<string, float> GetSkillPrioritiesFromList(List<TemplateManagerCharacterSkill> skillList)
     {
-        var result = new List<string>();
+        var result = new Dictionary<string, float>();
         foreach (var skill in skillList)
         {
-            if (skill.IsSkillImportant)
-            {
-                result.Add(skill.StringId);
-            }
+            result[skill.StringId] = skill.SkillPriority;
         }
         return result;
     }
@@ -61,9 +58,12 @@ public class TemplateCharacterDto
     public void ApplyToModel(TemplateManagerCharacter model)
     {
         model.Name = Name;
-        foreach (var skillId in ImportantSkillIdList)
+        if (SkillPriorityById != null)
         {
-            model.SetImportantSkill(skillId, true);
+            foreach (var skillPriority in SkillPriorityById)
+            {
+                model.SetSkillPriority(skillPriority.Key, skillPriority.Value);
+            }
         }
 
         foreach (var perkId in EnabledPerkIdList)

@@ -6,7 +6,8 @@
 
 
     <Window>
-        <Widget HeightSizePolicy="StretchToParent" WidthSizePolicy="Fixed" SuggestedWidth="1250" HorizontalAlignment="Stretch"
+        <Widget HeightSizePolicy="StretchToParent" WidthSizePolicy="Fixed" SuggestedWidth="1250"
+                HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch">
             <Children>
 
@@ -35,18 +36,6 @@
                             </Children>
                         </ButtonWidget>
 
-                        <ButtonWidget Id="ImportantSkillToggle" DoNotPassEventsToChildren="true"
-                                      WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
-                                      SuggestedWidth="180" SuggestedHeight="40"
-                                      Brush="@IsImportantButtonBrushStringId" MarginLeft="50"
-                                      Command.Click="ExecuteImportantSkillToggle">
-                            <Children>
-                                <RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
-                                                Brush="OverlayPopup.ButtonText" Brush.FontSize="20"
-                                                Text="@ImportantSkillText"/>
-                            </Children>
-                        </ButtonWidget>
-
                         <ButtonWidget Id="ClearAllPerks" DoNotPassEventsToChildren="true"
                                       WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
                                       SuggestedWidth="180" SuggestedHeight="40"
@@ -71,6 +60,8 @@
                             </Children>
                         </ButtonWidget>
 
+                        <TemplatePrioritySkillSlider  MarginLeft="50" MarginTop="-30" VerticalAlignment="Center"/>
+                        
                     </Children>
                 </ListPanel>
 
@@ -79,10 +70,12 @@
                         VerticalAlignment="Bottom" UpdateChildrenStates="true" MarginRight="8" MarginBottom="10">
                     <Children>
 
-                        <Widget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" IsVisible="@UseWarSailsSkillGrid">
+                        <Widget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
+                                IsVisible="@UseWarSailsSkillGrid">
                             <Children>
                                 <GridWidget DataSource="{SkillsVM}" WidthSizePolicy="CoverChildren" MarginTop="8"
-                                            HeightSizePolicy="CoverChildren" DefaultCellWidth="178" DefaultCellHeight="138"
+                                            HeightSizePolicy="CoverChildren" DefaultCellWidth="178"
+                                            DefaultCellHeight="138"
                                             ColumnCount="7" MarginLeft="11.558">
                                     <ItemTemplate>
                                         <TemplateSkillGridItem VerticalAlignment="Top" HorizontalAlignment="Center"
@@ -92,10 +85,12 @@
                             </Children>
                         </Widget>
 
-                        <Widget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" IsVisible="@UseVanillaSkillGrid">
+                        <Widget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"
+                                IsVisible="@UseVanillaSkillGrid">
                             <Children>
                                 <GridWidget DataSource="{SkillsVM}" WidthSizePolicy="CoverChildren" MarginTop="8"
-                                            HeightSizePolicy="CoverChildren" DefaultCellWidth="178" DefaultCellHeight="138"
+                                            HeightSizePolicy="CoverChildren" DefaultCellWidth="178"
+                                            DefaultCellHeight="138"
                                             ColumnCount="6" MarginLeft="11.558">
                                     <ItemTemplate>
                                         <TemplateSkillGridItem VerticalAlignment="Top" HorizontalAlignment="Center"
