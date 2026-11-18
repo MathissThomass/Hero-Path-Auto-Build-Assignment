@@ -21,7 +21,7 @@ public class TemplateManagerScreen : ScreenBase, IGameStateListener
     private GauntletLayer? _layer;
     private TemplateManagerState _templateManagerState;
     private SpriteCategory _clanCategory;
-    private SpriteCategory _navalCategory;
+    private SpriteCategory? _navalCategory;
     private SpriteCategory _townManagementCategory;
     public TemplateStore TemplateStore { get; set; }
     
@@ -55,11 +55,15 @@ public class TemplateManagerScreen : ScreenBase, IGameStateListener
         ResourceDepot uIResourceDepot = UIResourceManager.ResourceDepot;
         
         _clanCategory = spriteData.SpriteCategories["ui_clan"];
-        _navalCategory = spriteData.SpriteCategories["ui_naval_character_developer"];
         _townManagementCategory = spriteData.SpriteCategories["ui_town_management"];
         _clanCategory.Load(resourceContext, uIResourceDepot);
-        _navalCategory.Load(resourceContext, uIResourceDepot);
         _townManagementCategory.Load(resourceContext, uIResourceDepot);
+
+        if (spriteData.SpriteCategories.TryGetValue("ui_naval_character_developer", out var navalCategory))
+        {
+            _navalCategory = navalCategory;
+            _navalCategory.Load(resourceContext, uIResourceDepot);
+        }
         
         _layer = new GauntletLayer("TemplateManagerLayer", 11, true);
 

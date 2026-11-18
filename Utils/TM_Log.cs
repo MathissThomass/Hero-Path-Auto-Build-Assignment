@@ -11,13 +11,13 @@ public class TM_Log
     {
         InformationManager.DisplayMessage(new InformationMessage($"[TemplateManager] {msg}"));
         Debug.Print($"[TemplateManager] {msg}");
-        File.AppendAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "TemplateManagerLog.txt"), msg + Environment.NewLine);
+        //File.AppendAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "TemplateManagerLog.txt"), msg + Environment.NewLine);
     }
 
     public static void Error(string msg)
     {
         InformationManager.DisplayMessage(new InformationMessage($"[TemplateManager] {msg}", Colors.Red));
         Debug.Print($"[TemplateManager][ERROR] {msg}");
-        File.AppendAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "TemplateManagerLog.txt"), msg + Environment.NewLine);
+        //File.AppendAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "TemplateManagerLog.txt"), msg + Environment.NewLine);
     }
 }

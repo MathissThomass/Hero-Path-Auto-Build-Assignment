@@ -40,6 +40,7 @@ public class TemplateManagerVM : ViewModel
                 Name = "New created template"
             };
             newTemplate.CreateNewTemplate();
+            newTemplate.UpdateSavedStateSnapshot();
             _templateManagerCharacterList.Add(newTemplate);
             _currentTemplate = _templateManagerCharacterList[0];
         }
@@ -157,23 +158,18 @@ public class TemplateManagerVM : ViewModel
                 var dto = skillGridVm.TemplateCharacter.SavedStateSnapshot;
                 foreach (var skill in CharacterUtils.GetSkillsWithWarSails())
                 {
-                    skillGridVm.TemplateCharacter.SetImportantSkill(skill, false);
-                    var skillVmIndex = skillGridVm.SkillsVM.FindIndex(obj => obj.SkillId.Equals(skill.StringId));
-                    skillGridVm.SkillsVM[skillVmIndex].IsImportantSkill = false;
+                    skillGridVm.TemplateCharacter.SetSkillPriority(skill, 0f);
                 }
 
                 skillGridVm.TemplateCharacter.ClearAllPerks();
                 dto.ApplyToModel(skillGridVm.TemplateCharacter);
-                foreach (var importantSkillId in dto.ImportantSkillIdList)
-                {
-                    var skillVmIndex = skillGridVm.SkillsVM.FindIndex(obj => obj.SkillId.Equals(importantSkillId));
-                    skillGridVm.SkillsVM[skillVmIndex].IsImportantSkill = true;
-                }
-
                 foreach (var skillsVM in skillGridVm.SkillsVM)
                 {
+                    skillsVM.SkillPriority = skillGridVm.TemplateCharacter.GetSkillPriority(skillsVM.Skill);
                     skillsVM.RefreshSkillPerksState();
                 }
+
+                skillGridVm.SyncSliderWithCurrentSkill();
             }
         }
 

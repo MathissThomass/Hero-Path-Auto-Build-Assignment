@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Linq;
-using HeroPathAutoBuildAssignment.Utils;
 using HeroPathAutoBuildAssignment.Models;
 using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
-using TaleWorlds.Localization;
 
 namespace HeroPathAutoBuildAssignment.ViewModels;
 
@@ -22,17 +20,17 @@ public class TemplateManagerSkillVM : ViewModel
     private bool _canLearnSkill;
     private int _level;
     private int _maxLevel;
-    private bool _isImportantSkill;
+    private float _skillPriority;
     private int _numOfUnopenedPerks;
     Action<TemplateManagerSkillVM> onSkillSelection;
 
 
-    public TemplateManagerSkillVM(SkillObject skillObject, TemplateManagerCharacter template, bool isImportantSkill,
+    public TemplateManagerSkillVM(SkillObject skillObject, TemplateManagerCharacter template, float skillPriority,
         Action<TemplateManagerSkillVM> onSkillSelection) 
     {
         _perks = new MBBindingList<TemplateManagerPerkVM>();
         _skillObject = skillObject;
-        _isImportantSkill = isImportantSkill;
+        _skillPriority = TemplateManagerCharacter.ClampSkillPriority(skillPriority);
         SkillId = skillObject.StringId;
         NameText = skillObject.Name.ToString();
         FillHeroData(template);
@@ -53,7 +51,7 @@ public class TemplateManagerSkillVM : ViewModel
         _fullLearningRateLevel = 330;
         Level = 330;
         MaxLevel = 330;
-        IsImportantSkill = _isImportantSkill;
+        SkillPriority = _skillPriority;
 
         RefreshPerks();
     }
@@ -186,18 +184,32 @@ public class TemplateManagerSkillVM : ViewModel
     }
 
     [DataSourceProperty]
-    public bool IsImportantSkill
+    public float SkillPriority
     {
-        get { return _isImportantSkill; }
+        get { return _skillPriority; }
         set
         {
-            if (value != _isImportantSkill)
+            var roundedValue = TemplateManagerCharacter.ClampSkillPriority(value);
+            if (roundedValue != _skillPriority)
             {
-                _isImportantSkill = value;
-                OnPropertyChangedWithValue(value, "IsImportantSkill");
-
+                _skillPriority = roundedValue;
+                OnPropertyChangedWithValue(roundedValue, "SkillPriority");
+                OnPropertyChanged("SkillPriorityText");
+                OnPropertyChanged("HasSkillPriority");
             }
         }
+    }
+
+    [DataSourceProperty]
+    public string SkillPriorityText
+    {
+        get { return _skillPriority.ToString("0.##"); }
+    }
+
+    [DataSourceProperty]
+    public bool HasSkillPriority
+    {
+        get { return _skillPriority != 0f; }
     }
     
     [DataSourceProperty]
@@ -311,6 +323,4 @@ public class TemplateManagerSkillVM : ViewModel
         return _template.GetPerkValue(perk);
     }
     
-    [DataSourceProperty]
-    public string ImportantSkillText { get; set; } = new TextObject("{=important_skill_text}Priority skill").ToString();
 }

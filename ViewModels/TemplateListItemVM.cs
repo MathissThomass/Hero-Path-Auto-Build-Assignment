@@ -11,6 +11,8 @@ public class TemplateListItemVM : ViewModel
     private string _templateName;
     Action<TemplateListItemVM> _onTemplateSelection;
     private MBBindingList<TemplateSkillOverviewVM> _skillsVm;
+    private readonly bool _useWarSailsSkillGrid;
+    private readonly bool _useVanillaSkillGrid;
     public TemplateManagerCharacter _templateManagerCharacter;
 
     public TemplateListItemVM(TemplateManagerCharacter templateManagerCharacter,
@@ -21,8 +23,16 @@ public class TemplateListItemVM : ViewModel
         _templateManagerCharacter = templateManagerCharacter;
         _onTemplateSelection = onTemplateSelection;
         _skillsVm = new MBBindingList<TemplateSkillOverviewVM>();
+        _useWarSailsSkillGrid = CharacterUtils.IsWarSailsActive();
+        _useVanillaSkillGrid = !_useWarSailsSkillGrid;
         RefreshSkillsVm(templateManagerCharacter);
     }
+
+    [DataSourceProperty]
+    public bool UseWarSailsSkillGrid => _useWarSailsSkillGrid;
+
+    [DataSourceProperty]
+    public bool UseVanillaSkillGrid => _useVanillaSkillGrid;
 
     private void OnTemplateSelected()
     {
@@ -37,8 +47,8 @@ public class TemplateListItemVM : ViewModel
         var skillList = CharacterUtils.GetSkillsWithWarSails();
         foreach (var skill in skillList)
         {
-            var isImportantSkill = templateManagerCharacter.GetImportantSkill(skill);
-            SkillsVm.Add(new TemplateSkillOverviewVM(skill, isImportantSkill));
+            var skillPriority = templateManagerCharacter.GetSkillPriority(skill);
+            SkillsVm.Add(new TemplateSkillOverviewVM(skill, skillPriority));
         }
 
         OnPropertyChanged("SkillsVm");

@@ -1,5 +1,7 @@
 ﻿using HeroPathAutoBuildAssignment.Data;
+using HeroPathAutoBuildAssignment.Settings;
 using HeroPathAutoBuildAssignment.Utils;
+using MCM.Abstractions.Base.Global;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Core;
@@ -11,6 +13,7 @@ public class AutoAssignBehavior : CampaignBehaviorBase
     public override void RegisterEvents()
     {
         CampaignEvents.HeroGainedSkill.AddNonSerializedListener(this, OnHeroGainedSkill);
+        CampaignEvents.HeroLevelledUp.AddNonSerializedListener(this, OnHeroLevelledUp);
         CampaignEvents.OnGameLoadFinishedEvent.AddNonSerializedListener(this, OnGameLoadFinished);
         CampaignEvents.HeroKilledEvent.AddNonSerializedListener(this, OnHeroDied);
     }
@@ -40,13 +43,28 @@ public class AutoAssignBehavior : CampaignBehaviorBase
                 var initialLvl = skillLvl - change;
                 AutoAssign.AutoAssignPerkPoint(hero, heroTemplate, skill, initialLvl);
             }
+        }
+    }
+
+    private static void OnHeroLevelledUp(Hero hero, bool shouldNotify = true)
+    {
+        if (hero.Clan == Clan.PlayerClan)
+        {
+            var templateList = TemplateStore.Instance.TemplateList;
+            var heroTemplate = CharacterUtils.FindHeroAssignedTemplate(hero, templateList);
+            var settings = GlobalSettings<HeroPathSettings>.Instance;
+
+            if (heroTemplate == null || settings == null)
+            {
+                return;
+            }
             
-            if (hero.HeroDeveloper.UnspentAttributePoints > 0)
+            if (settings.AttributAutomaticAssignment && hero.HeroDeveloper.UnspentAttributePoints > 0)
             {
                 AutoAssign.AutoAssignAttributPoint(hero, heroTemplate);
             }
 
-            if (hero.HeroDeveloper.UnspentFocusPoints > 0)
+            if (settings.FocusAutomaticAssignment && hero.HeroDeveloper.UnspentFocusPoints > 0)
             {
                 AutoAssign.AutoAssignFocusPoint(hero, heroTemplate);
             }
@@ -55,15 +73,18 @@ public class AutoAssignBehavior : CampaignBehaviorBase
 
     private static void OnGameLoadFinished()
     {
+        TemplateSaveManager.ConvertLegacySkillPriorities();
         TemplateStore.Instance.LoadFromDisk();
     }
 
-    private static void OnHeroDied(Hero victim, Hero killer, KillCharacterAction.KillCharacterActionDetail deathDetail, bool showNotification)
+    private static void OnHeroDied(Hero victim, Hero killer, KillCharacterAction.KillCharacterActionDetail deathDetail,
+        bool showNotification)
     {
         if (victim.Clan != Clan.PlayerClan)
         {
             return;
         }
+
         TemplateSaveManager.RemoveHeroFromTemplate(victim);
     }
 }

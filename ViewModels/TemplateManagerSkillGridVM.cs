@@ -15,17 +15,27 @@ public class TemplateManagerSkillGridVM : ViewModel
 
     private TemplateManagerSkillVM _currentSkillVM;
 
-    private bool _isImportantSkillToggleOn;
-    
+    private readonly bool _useWarSailsSkillGrid;
+    private readonly bool _useVanillaSkillGrid;
+    private float _skillPriorityValue = 0f;
+    private bool _suppressPriorityApply;
+
     Action<TemplateManagerCharacter> _onSaveTemplate;
 
-    public TemplateManagerSkillGridVM(TemplateManagerCharacter templateCharacter, Action<TemplateManagerCharacter> onSaveTemplate)
+    public TemplateManagerSkillGridVM(TemplateManagerCharacter templateCharacter,
+        Action<TemplateManagerCharacter> onSaveTemplate)
     {
         TemplateCharacter = templateCharacter;
         _skillsVM = new MBBindingList<TemplateManagerSkillVM>();
+        _useWarSailsSkillGrid = CharacterUtils.IsWarSailsActive();
+        _useVanillaSkillGrid = !_useWarSailsSkillGrid;
         _onSaveTemplate = onSaveTemplate;
         RefreshHeroSkills();
     }
+
+    [DataSourceProperty] public bool UseWarSailsSkillGrid => _useWarSailsSkillGrid;
+
+    [DataSourceProperty] public bool UseVanillaSkillGrid => _useVanillaSkillGrid;
 
     [DataSourceProperty]
     public MBBindingList<TemplateManagerSkillVM> SkillsVM
@@ -56,9 +66,29 @@ public class TemplateManagerSkillGridVM : ViewModel
     }
 
     [DataSourceProperty]
-    public string IsImportantButtonBrushStringId
+    public float SkillPriorityValue
     {
-        get { return _isImportantSkillToggleOn ? "ButtonBrush1" : "ButtonBrush2"; }
+        get => _skillPriorityValue;
+        set
+        {
+            var roundedValue = TemplateManagerCharacter.ClampSkillPriority(value);
+            if (roundedValue != _skillPriorityValue)
+            {
+                _skillPriorityValue = roundedValue;
+                OnPropertyChangedWithValue(roundedValue, "SkillPriorityValue");
+                OnPropertyChanged("SkillPriorityValueText");
+                if (!_suppressPriorityApply)
+                {
+                    ApplyPriorityToCurrentSkill(roundedValue);
+                }
+            }
+        }
+    }
+
+    [DataSourceProperty]
+    public string SkillPriorityValueText
+    {
+        get { return $"{_skillPriorityValue}"; }
     }
 
     private void ExecuteClearSkillPerks()
@@ -74,12 +104,6 @@ public class TemplateManagerSkillGridVM : ViewModel
         {
             skillsVM.RefreshSkillPerksState();
         }
-    }
-
-    private void ExecuteImportantSkillToggle()
-    {
-        _isImportantSkillToggleOn = !_isImportantSkillToggleOn;
-        OnPropertyChanged("IsImportantButtonBrushStringId");
     }
 
     public void SaveUsingCurrentName()
@@ -131,14 +155,15 @@ public class TemplateManagerSkillGridVM : ViewModel
         foreach (SkillObject current in skillObjectList)
         {
             SkillsVM.Add(new TemplateManagerSkillVM(current, TemplateCharacter,
-                TemplateCharacter.GetImportantSkill(current), OnSkillSelectedChange));
+                TemplateCharacter.GetSkillPriority(current), OnSkillSelectedChange));
         }
 
         SkillsVM[0].IsInspected = true;
         _currentSkillVM = SkillsVM[0];
         OnPropertyChanged("CurrentSkill");
+        SyncSliderWithCurrentSkill();
     }
-    
+
     public void OnSkillSelectedChange(TemplateManagerSkillVM templateManagerSkillVM)
     {
         if (templateManagerSkillVM != _currentSkillVM)
@@ -147,22 +172,42 @@ public class TemplateManagerSkillGridVM : ViewModel
             CurrentSkill = templateManagerSkillVM;
         }
 
-        if (_isImportantSkillToggleOn)
-        {
-            _currentSkillVM.IsImportantSkill = !_currentSkillVM.IsImportantSkill;
-            TemplateCharacter.SetImportantSkill(_currentSkillVM.Skill, _currentSkillVM.IsImportantSkill);
-        }
+        SyncSliderWithCurrentSkill();
     }
-    
-    [DataSourceProperty]
-    public string ImportantSkillText { get; set; } = new TextObject("{=important_skill_text}Priority skill").ToString();
-    
-    [DataSourceProperty]
-    public string SaveText { get; set; } = new TextObject("{=bV75iwKa}Save").ToString();
-    
+
+    public void SyncSliderWithCurrentSkill()
+    {
+        if (_currentSkillVM == null)
+        {
+            return;
+        }
+
+        _suppressPriorityApply = true;
+        SkillPriorityValue = _currentSkillVM.SkillPriority;
+        _suppressPriorityApply = false;
+    }
+
+    private void ApplyPriorityToCurrentSkill(float skillPriority)
+    {
+        if (_currentSkillVM == null)
+        {
+            return;
+        }
+
+        _currentSkillVM.SkillPriority = skillPriority;
+        TemplateCharacter.SetSkillPriority(_currentSkillVM.Skill, skillPriority);
+    }
+
+    [DataSourceProperty] public string SaveText { get; set; } = new TextObject("{=bV75iwKa}Save").ToString();
+
     [DataSourceProperty]
     public string ClearAllPerksText { get; set; } = new TextObject("{=clear_all_perks_text}Clear all perks").ToString();
+
+    [DataSourceProperty]
+    public string ClearAllSkillPerkText { get; set; } =
+        new TextObject("{=clear_all_skill_perk_text}Clear all skill perks").ToString();
     
     [DataSourceProperty]
-    public string ClearAllSkillPerkText { get; set; } = new TextObject("{=clear_all_skill_perk_text}Clear all skill perks").ToString();
+    public string SetSkillPriorityText { get; set; } =
+        new TextObject("{=set_skill_priority_text}Set the priority of this skill :").ToString();
 }

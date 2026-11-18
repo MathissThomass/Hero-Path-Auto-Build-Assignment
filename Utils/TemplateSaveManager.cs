@@ -1,19 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using HeroPathAutoBuildAssignment.Data;
 using HeroPathAutoBuildAssignment.Models;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.Core;
 using Path = System.IO.Path;
 
 namespace HeroPathAutoBuildAssignment.Utils;
 
 public class TemplateSaveManager
 {
-    private static readonly string SavesFolderName = "SavedTemplates";
+    private const float LegacyImportantSkillPriority = 0.5f;
+    private const string LegacyImportantSkillListProperty = "ImportantSkillIdList";
+    private const string SkillPriorityProperty = "SkillPriorityById";
 
     private static string SanitizeFileName(string name)
     {
@@ -24,16 +27,9 @@ public class TemplateSaveManager
         return cleaned;
     }
 
-    private static string GetModFolder()
-    {
-        var asmPath = Assembly.GetExecutingAssembly().Location;
-        return Path.GetDirectoryName(asmPath);
-    }
-
     private static string GetSavesFolder()
     {
-        var modFolder = GetModFolder();
-        var savesFolder = Path.Combine(modFolder, SavesFolderName);
+        var savesFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Mount and Blade II Bannerlord", "Configs", "Hero's Path", "SavedTemplates");
         if (!Directory.Exists(savesFolder)) Directory.CreateDirectory(savesFolder);
         return savesFolder;
     }
@@ -66,6 +62,79 @@ public class TemplateSaveManager
         var folder = GetSavesFolder();
         if (!Directory.Exists(folder)) return null;
         return Directory.GetFiles(folder, "*.json");
+    }
+
+    public static void ConvertLegacySkillPriorities()
+    {
+        if (Game.Current?.ObjectManager == null)
+        {
+            return;
+        }
+
+        var files = ListSavedTemplates();
+        if (files == null)
+        {
+            return;
+        }
+
+        foreach (var file in files)
+        {
+            try
+            {
+                ConvertLegacySkillPriorityFile(file);
+            }
+            catch (Exception e)
+            {
+                TM_Log.Error($"Erreur lors de la conversion de {file} : {e.Message}");
+            }
+        }
+    }
+
+    private static void ConvertLegacySkillPriorityFile(string filePath)
+    {
+        var json = File.ReadAllText(filePath);
+        var data = JObject.Parse(json);
+        if (data[SkillPriorityProperty] != null)
+        {
+            return;
+        }
+
+        var importantSkillIds = new HashSet<string>(StringComparer.Ordinal);
+        if (data[LegacyImportantSkillListProperty] is JArray importantSkills)
+        {
+            foreach (var skillId in importantSkills)
+            {
+                var id = skillId?.ToString();
+                if (!string.IsNullOrEmpty(id))
+                {
+                    importantSkillIds.Add(id);
+                }
+            }
+        }
+
+        var priorities = new JObject();
+        foreach (var skill in CharacterUtils.GetSkillsWithWarSails())
+        {
+            if (skill == null || string.IsNullOrEmpty(skill.StringId))
+            {
+                continue;
+            }
+
+            var priority = importantSkillIds.Contains(skill.StringId) ? LegacyImportantSkillPriority : 0f;
+            priorities[skill.StringId] = priority;
+        }
+
+        foreach (var skillId in importantSkillIds)
+        {
+            if (priorities[skillId] == null)
+            {
+                priorities[skillId] = LegacyImportantSkillPriority;
+            }
+        }
+
+        data.Remove(LegacyImportantSkillListProperty);
+        data[SkillPriorityProperty] = priorities;
+        File.WriteAllText(filePath, data.ToString(Formatting.Indented));
     }
 
     public static List<TemplateManagerCharacter> LoadSavedTemplatesList()

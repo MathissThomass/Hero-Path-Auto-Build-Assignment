@@ -6,26 +6,58 @@
 
 
     <Window>
+        <Widget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren">
+        <Children>
 
-        <GridWidget Id="SkillGrid" DataSource="{SkillsVm}" HorizontalAlignment="Right" VerticalAlignment="Center"
-                    WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" DefaultCellWidth="42"
-                    DefaultCellHeight="42" ColumnCount="7">
-            <ItemTemplate>
-                <SkillIconVisualWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="40"
-                                       SuggestedHeight="40" SkillId="@SkillId" MarginBottom="2" UseSmallVariation="true"
-                                       MarginLeft="2">
-                    <Children>
-                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="20"
-                                    Text="@IsImportantSkillText" VerticalAlignment="Center" Brush="Encyclopedia.Skill.Text"
-                                    Brush.FontSize="20" Brush.FontColor="#FCB066FF" IsVisible="@ImportantSkill"/>
+        <Widget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" IsVisible="@UseWarSailsSkillGrid">
+            <Children>
+                <GridWidget Id="SkillGrid" DataSource="{SkillsVm}" HorizontalAlignment="Right" VerticalAlignment="Center"
+                            WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" DefaultCellWidth="42"
+                            DefaultCellHeight="42" ColumnCount="7">
+                    <ItemTemplate>
+                        <SkillIconVisualWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="40"
+                                               SuggestedHeight="40" SkillId="@SkillId" MarginBottom="2" UseSmallVariation="true"
+                                               MarginLeft="2">
+                            <Children>
+                                <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="20"
+                                            Text="@SkillPriorityText" VerticalAlignment="Center" Brush="Encyclopedia.Skill.Text"
+                                            Brush.FontSize="20" Brush.FontColor="#FCB066FF" IsVisible="@HasSkillPriority"/>
 
-                        <HintWidget DataSource="{Hint}" HeightSizePolicy="StretchToParent"
-                                    WidthSizePolicy="StretchToParent" Command.HoverBegin="ExecuteBeginHint"
-                                    Command.HoverEnd="ExecuteEndHint"/>
-                    </Children>
-                </SkillIconVisualWidget>
-            </ItemTemplate>
-        </GridWidget>
+                                <HintWidget DataSource="{Hint}" HeightSizePolicy="StretchToParent"
+                                            WidthSizePolicy="StretchToParent" Command.HoverBegin="ExecuteBeginHint"
+                                            Command.HoverEnd="ExecuteEndHint"/>
+                            </Children>
+                        </SkillIconVisualWidget>
+                    </ItemTemplate>
+                </GridWidget>
+            </Children>
+        </Widget>
 
+        <Widget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" IsVisible="@UseVanillaSkillGrid">
+            <Children>
+                <GridWidget Id="SkillGridVanilla" DataSource="{SkillsVm}" HorizontalAlignment="Right" VerticalAlignment="Center"
+                            WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" DefaultCellWidth="42"
+                            DefaultCellHeight="42" ColumnCount="6">
+                    <ItemTemplate>
+                        <SkillIconVisualWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="40"
+                                               SuggestedHeight="40" SkillId="@SkillId" MarginBottom="2" UseSmallVariation="true"
+                                               MarginLeft="2">
+                            <Children>
+                                <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="20"
+                                            Text="@SkillPriorityText" VerticalAlignment="Center" Brush="Encyclopedia.Skill.Text"
+                                            Brush.FontSize="20" Brush.FontColor="#FCB066FF" IsVisible="@HasSkillPriority"/>
+
+                                <HintWidget DataSource="{Hint}" HeightSizePolicy="StretchToParent"
+                                            WidthSizePolicy="StretchToParent" Command.HoverBegin="ExecuteBeginHint"
+                                            Command.HoverEnd="ExecuteEndHint"/>
+                            </Children>
+                        </SkillIconVisualWidget>
+                    </ItemTemplate>
+                </GridWidget>
+            </Children>
+        </Widget>
+
+        </Children>
+        </Widget>
     </Window>
 </Prefab>
