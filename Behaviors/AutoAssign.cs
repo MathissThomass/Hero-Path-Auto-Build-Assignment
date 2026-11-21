@@ -117,7 +117,9 @@ public class AutoAssign
 
     public static void CatchUpAssignedHero(Hero hero, TemplateManagerCharacter template)
     {
-        if (hero?.HeroDeveloper == null || template == null)
+        var settings = GlobalSettings<HeroPathSettings>.Instance;
+        
+        if (hero?.HeroDeveloper == null || template == null || settings == null)
         {
             return;
         }
@@ -132,12 +134,12 @@ public class AutoAssign
             AutoAssignPerkPoint(hero, template, skill, 0);
         }
 
-        if (hero.HeroDeveloper.UnspentAttributePoints > 0)
+        if (settings.AttributAutomaticAssignment && hero.HeroDeveloper.UnspentAttributePoints > 0)
         {
             AutoAssignAttributPoint(hero, template);
         }
 
-        if (hero.HeroDeveloper.UnspentFocusPoints > 0)
+        if (settings.FocusAutomaticAssignment && hero.HeroDeveloper.UnspentFocusPoints > 0)
         {
             AutoAssignFocusPoint(hero, template);
         }
