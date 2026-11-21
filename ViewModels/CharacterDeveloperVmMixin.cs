@@ -2,6 +2,7 @@
 using Bannerlord.UIExtenderEx.ViewModels;
 using HeroPathAutoBuildAssignment.Behaviors;
 using HeroPathAutoBuildAssignment.Data;
+using HeroPathAutoBuildAssignment.Models;
 using HeroPathAutoBuildAssignment.State;
 using HeroPathAutoBuildAssignment.Utils;
 using TaleWorlds.CampaignSystem.ViewModelCollection.CharacterDeveloper;
@@ -89,9 +90,9 @@ internal class CharacterDeveloperVmMixin : BaseViewModelMixin<CharacterDeveloper
             return;
         }
 
-        AutoAssign.CatchUpAssignedHero(currentHero, heroTemplate);
-
-        _vm.RefreshValues();
+        var target = new CharacterDeveloperAutoAssignTarget(_vm.CurrentCharacter);
+        
+        AutoAssign.CatchUpAssignedHero(target, heroTemplate);
     }
 
     [DataSourceProperty]

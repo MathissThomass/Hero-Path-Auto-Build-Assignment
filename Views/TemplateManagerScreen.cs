@@ -2,6 +2,7 @@
 using HeroPathAutoBuildAssignment.Utils;
 using HeroPathAutoBuildAssignment.Behaviors;
 using HeroPathAutoBuildAssignment.Data;
+using HeroPathAutoBuildAssignment.Models;
 using HeroPathAutoBuildAssignment.State;
 using HeroPathAutoBuildAssignment.ViewModels;
 using TaleWorlds.Core;
@@ -104,7 +105,8 @@ public class TemplateManagerScreen : ScreenBase, IGameStateListener
                     continue;
                 }
 
-                AutoAssign.CatchUpAssignedHero(hero, template);
+                var target = new HeroAutoAssignTarget(hero);
+                AutoAssign.CatchUpAssignedHero(target, template);
             }
         }
     }
