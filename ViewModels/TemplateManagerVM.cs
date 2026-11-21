@@ -173,8 +173,8 @@ public class TemplateManagerVM : ViewModel
             }
         }
 
-        _templateListVM.RefreshTemplateList(0);
-        _currentSkillGridVM = SkillGridListVm[0];
+        _templateListVM.RefreshTemplateList(_currentTemplateIndex);
+        _currentSkillGridVM = SkillGridListVm[_currentTemplateIndex];
         OnPropertyChanged("TemplateSkillGridVM");
     }
 
