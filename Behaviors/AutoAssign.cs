@@ -17,10 +17,10 @@ public class AutoAssign
     private const double LearningRateCapMultiplier = 9.0;
 
     
-    public static void AutoAssignFocusPoint(Hero hero, TemplateManagerCharacter template)
+    public static void AutoAssignFocusPoint(IAutoAssignTarget target, TemplateManagerCharacter template)
     {
 
-        while (hero.HeroDeveloper.UnspentFocusPoints > 0)
+        while (target.UnspentFocusPoints > 0)
         {
             var weightList = new Dictionary<SkillObject, double>();
 
@@ -28,25 +28,25 @@ public class AutoAssign
             foreach (var templateSkill in template.SkillList)
             {
                 var skill = templateSkill.Skill;
-                if (!hero.HeroDeveloper.CanAddFocusToSkill(skill))
+                if (!target.CanAddFocusToSkill(skill))
                 {
                     weightList[skill] = 0;
                     continue;
                 }
 
-                if (!HasRoomForFocusPoint(hero, template, skill))
+                if (!HasRoomForFocusPoint(target, template, skill))
                 {
                     weightList[skill] = 0;
                     continue;
                 }
 
                 var skillPriority = templateSkill.SkillPriority;
-                var learningRate = CharacterUtils.GetLearningRate(hero, skill);
+                var learningRate = CharacterUtils.GetLearningRate(target, skill);
 
                 var baseWeight = 1.0 / learningRate;
                 var mult = 1.0 + skillPriority;
                 double weight = baseWeight;
-                var learningRateAfterApplyFocus = CharacterUtils.GetLearningRate(hero, skill, 1);
+                var learningRateAfterApplyFocus = CharacterUtils.GetLearningRate(target, skill, 1);
                 if ( learningRateAfterApplyFocus > LearningRateCapMultiplier)
                 {
                     weight /= learningRateAfterApplyFocus;
@@ -66,15 +66,15 @@ public class AutoAssign
                 break;
             }
             
-            hero.HeroDeveloper.AddFocus(pick, 1);
+            target.AddFocus(pick, 1);
         }
     }
     
-    public static void AutoAssignAttributPoint(Hero hero, TemplateManagerCharacter template)
+    public static void AutoAssignAttributPoint(IAutoAssignTarget target, TemplateManagerCharacter template)
     {
         var attributesWithoutRoom = new HashSet<CharacterAttribute>();
 
-        while(hero.HeroDeveloper.UnspentAttributePoints > 0)
+        while(target.UnspentAttributePoints > 0)
         {
             var weightList = new Dictionary<SkillObject, double>();
 
@@ -82,14 +82,14 @@ public class AutoAssign
             foreach (var templateSkill in template.SkillList)
             {
                 var skill = templateSkill.Skill;
-                if (!hero.HeroDeveloper.CanAddFocusToSkill(skill))
+                if (!target.CanAddFocusToSkill(skill))
                 {
                     weightList[skill] = 0;
                     continue;
                 }
 
                 var skillPriority = templateSkill.SkillPriority;
-                var learningRate = CharacterUtils.GetLearningRate(hero, skill);
+                var learningRate = CharacterUtils.GetLearningRate(target, skill);
 
                 var baseWeight = 1.0 / learningRate;
                 var mult = 1.0 + skillPriority;
@@ -105,19 +105,21 @@ public class AutoAssign
                 break;
             }
 
-            if (!HasRoomForAttributePoint(hero, template, pick))
+            if (!HasRoomForAttributePoint(target, template, pick))
             {
                 attributesWithoutRoom.Add(pick);
                 continue;
             }
             
-            hero.HeroDeveloper.AddAttribute(pick, 1);
+            target.AddAttribute(pick, 1);
         }
     }
 
-    public static void CatchUpAssignedHero(Hero hero, TemplateManagerCharacter template)
+    public static void CatchUpAssignedHero(IAutoAssignTarget target, TemplateManagerCharacter template)
     {
-        if (hero?.HeroDeveloper == null || template == null)
+        var settings = GlobalSettings<HeroPathSettings>.Instance;
+        
+        if (target == null || template == null || settings == null)
         {
             return;
         }
@@ -129,24 +131,24 @@ public class AutoAssign
                 continue;
             }
 
-            AutoAssignPerkPoint(hero, template, skill, 0);
+            AutoAssignPerkPoint(target, template, skill, 0);
         }
 
-        if (hero.HeroDeveloper.UnspentAttributePoints > 0)
+        if (settings.AttributAutomaticAssignment && target.UnspentAttributePoints > 0)
         {
-            AutoAssignAttributPoint(hero, template);
+            AutoAssignAttributPoint(target, template);
         }
 
-        if (hero.HeroDeveloper.UnspentFocusPoints > 0)
+        if (settings.FocusAutomaticAssignment && target.UnspentFocusPoints > 0)
         {
-            AutoAssignFocusPoint(hero, template);
+            AutoAssignFocusPoint(target, template);
         }
     }
 
-    public static void AutoAssignPerkPoint(Hero hero, TemplateManagerCharacter template, SkillObject skill,
+    public static void AutoAssignPerkPoint(IAutoAssignTarget target, TemplateManagerCharacter template, SkillObject skill,
         int initialLvl)
     {
-        var unlockedPerks = CharacterUtils.GetPerksForSkillInRange(skill, initialLvl, hero.GetSkillValue(skill));
+        var unlockedPerks = CharacterUtils.GetPerksForSkillInRange(skill, initialLvl, target.Hero.GetSkillValue(skill));
         var templatePerkList = template.PerkList.FindAll(perk => perk.Enable).Select(perk => perk.StringId).ToList();
         var unlockedPerkIdInTemplate =
             unlockedPerks.Select(perkObject => perkObject.StringId).Intersect(templatePerkList);
@@ -156,12 +158,12 @@ public class AutoAssign
         var settings = GlobalSettings<HeroPathSettings>.Instance;
 
         foreach (var perk in from perk in perkInTemplateToAdd
-                 let perkValue = hero.GetPerkValue(perk)
-                 let alternativePerkValue = hero.GetPerkValue(perk.AlternativePerk)
+                 let perkValue = target.GetPerkValue(perk)
+                 let alternativePerkValue = target.GetPerkValue(perk.AlternativePerk)
                  where !perkValue && !alternativePerkValue
                  select perk)
         {
-            hero.HeroDeveloper.AddPerk(ChoosePerkRespectingCaps(hero, perk));
+            target.AddPerk(ChoosePerkRespectingCaps(target, perk));
         }
 
         if (settings is { UnSelectedPerkRandomAssignment: false })
@@ -172,51 +174,51 @@ public class AutoAssign
         var perkToRandomize = unlockedPerks.Except(perkInTemplateToAdd);
         foreach (var perk in perkToRandomize)
         {
-            if (!hero.GetPerkValue(perk) && perk.AlternativePerk == null)
+            if (!target.GetPerkValue(perk) && perk.AlternativePerk == null)
             {
-                hero.HeroDeveloper.AddPerk(ChoosePerkRespectingCaps(hero, perk));
+                target.AddPerk(ChoosePerkRespectingCaps(target, perk));
                 continue;
             }
 
-            if (hero.GetPerkValue(perk) || perk.AlternativePerk == null ||
-                hero.GetPerkValue(perk.AlternativePerk)) continue;
+            if (target.GetPerkValue(perk) || perk.AlternativePerk == null ||
+                target.GetPerkValue(perk.AlternativePerk)) continue;
             var rand = _rng.Next(2);
 
             var picked = rand == 0 ? perk : perk.AlternativePerk;
-            hero.HeroDeveloper.AddPerk(ChoosePerkRespectingCaps(hero, picked));
+            target.AddPerk(ChoosePerkRespectingCaps(target, picked));
         }
     }
 
-    private static bool HasRoomForFocusPoint(Hero hero, TemplateManagerCharacter template, SkillObject skill)
+    private static bool HasRoomForFocusPoint(IAutoAssignTarget target, TemplateManagerCharacter template, SkillObject skill)
     {
         var maxFocus = Campaign.Current.Models.CharacterDevelopmentModel.MaxFocusPerSkill;
-        var currentFocus = hero.HeroDeveloper.GetFocus(skill);
-        return currentFocus + 1 + CountPendingFocusBonuses(hero, template, skill) <= maxFocus;
+        var currentFocus = target.GetFocus(skill);
+        return currentFocus + 1 + CountPendingFocusBonuses(target, template, skill) <= maxFocus;
     }
 
-    private static bool HasRoomForAttributePoint(Hero hero, TemplateManagerCharacter template, CharacterAttribute attribute)
+    private static bool HasRoomForAttributePoint(IAutoAssignTarget target, TemplateManagerCharacter template, CharacterAttribute attribute)
     {
         var maxAttribute = Campaign.Current.Models.CharacterDevelopmentModel.MaxAttribute;
-        var currentAttribute = hero.GetAttributeValue(attribute);
-        return currentAttribute + 1 + CountPendingAttributeBonuses(hero, template, attribute) <= maxAttribute;
+        var currentAttribute = target.GetAttributeValue(attribute);
+        return currentAttribute + 1 + CountPendingAttributeBonuses(target, template, attribute) <= maxAttribute;
     }
 
-    private static int CountPendingFocusBonuses(Hero hero, TemplateManagerCharacter template, SkillObject skill)
+    private static int CountPendingFocusBonuses(IAutoAssignTarget target, TemplateManagerCharacter template, SkillObject skill)
     {
         if (skill != DefaultSkills.OneHanded && skill != DefaultSkills.TwoHanded)
         {
             return 0;
         }
 
-        return IsTemplatePerkStillPending(hero, template, DefaultPerks.Crafting.WeaponMasterSmith) ? 1 : 0;
+        return IsTemplatePerkStillPending(target, template, DefaultPerks.Crafting.WeaponMasterSmith) ? 1 : 0;
     }
 
-    private static int CountPendingAttributeBonuses(Hero hero, TemplateManagerCharacter template, CharacterAttribute attribute)
+    private static int CountPendingAttributeBonuses(IAutoAssignTarget target, TemplateManagerCharacter template, CharacterAttribute attribute)
     {
         var count = 0;
         foreach (var perk in EnumerateAttributeGrantingPerks(attribute))
         {
-            if (IsTemplatePerkStillPending(hero, template, perk))
+            if (IsTemplatePerkStillPending(target, template, perk))
             {
                 count++;
             }
@@ -225,26 +227,26 @@ public class AutoAssign
         return count;
     }
 
-    private static bool IsTemplatePerkStillPending(Hero hero, TemplateManagerCharacter template, PerkObject? perk)
+    private static bool IsTemplatePerkStillPending(IAutoAssignTarget target, TemplateManagerCharacter template, PerkObject? perk)
     {
-        if (perk == null || !template.GetPerkValue(perk) || hero.GetPerkValue(perk))
+        if (perk == null || !template.GetPerkValue(perk) || target.GetPerkValue(perk))
         {
             return false;
         }
 
         var alternative = perk.AlternativePerk;
-        return alternative == null || !hero.GetPerkValue(alternative);
+        return alternative == null || !target.GetPerkValue(alternative);
     }
 
-    private static PerkObject ChoosePerkRespectingCaps(Hero hero, PerkObject perk)
+    private static PerkObject ChoosePerkRespectingCaps(IAutoAssignTarget target, PerkObject perk)
     {
-        if (!GrantsBlockedBonus(hero, perk))
+        if (!GrantsBlockedBonus(target, perk))
         {
             return perk;
         }
 
         var alternative = perk.AlternativePerk;
-        if (alternative == null || GrantsSameBlockedBonus(hero, perk, alternative))
+        if (alternative == null || GrantsSameBlockedBonus(target, perk, alternative))
         {
             return perk;
         }
@@ -252,11 +254,11 @@ public class AutoAssign
         return alternative;
     }
 
-    private static bool GrantsBlockedBonus(Hero hero, PerkObject perk)
+    private static bool GrantsBlockedBonus(IAutoAssignTarget target, PerkObject perk)
     {
         foreach (var bonus in GetPerkBonuses(perk))
         {
-            if (IsBonusAtCap(hero, bonus))
+            if (IsBonusAtCap(target, bonus))
             {
                 return true;
             }
@@ -265,11 +267,11 @@ public class AutoAssign
         return false;
     }
 
-    private static bool GrantsSameBlockedBonus(Hero hero, PerkObject chosen, PerkObject alternative)
+    private static bool GrantsSameBlockedBonus(IAutoAssignTarget target, PerkObject chosen, PerkObject alternative)
     {
         foreach (var blocked in GetPerkBonuses(chosen))
         {
-            if (!IsBonusAtCap(hero, blocked))
+            if (!IsBonusAtCap(target, blocked))
             {
                 continue;
             }
@@ -291,17 +293,17 @@ public class AutoAssign
         return false;
     }
 
-    private static bool IsBonusAtCap(Hero hero, PerkBonus bonus)
+    private static bool IsBonusAtCap(IAutoAssignTarget target, PerkBonus bonus)
     {
         if (bonus.Attribute != null)
         {
-            return hero.GetAttributeValue(bonus.Attribute) >=
+            return target.GetAttributeValue(bonus.Attribute) >=
                    Campaign.Current.Models.CharacterDevelopmentModel.MaxAttribute;
         }
 
         if (bonus.Skill != null)
         {
-            return hero.HeroDeveloper.GetFocus(bonus.Skill) >=
+            return target.GetFocus(bonus.Skill) >=
                    Campaign.Current.Models.CharacterDevelopmentModel.MaxFocusPerSkill;
         }
 

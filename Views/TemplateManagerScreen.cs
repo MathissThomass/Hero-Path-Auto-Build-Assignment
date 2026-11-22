@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
-using HeroPathAutoBuildAssignment.Utils;
 using HeroPathAutoBuildAssignment.Behaviors;
 using HeroPathAutoBuildAssignment.Data;
+using HeroPathAutoBuildAssignment.HarmonyPatches;
+using HeroPathAutoBuildAssignment.Models;
 using HeroPathAutoBuildAssignment.State;
 using HeroPathAutoBuildAssignment.ViewModels;
 using TaleWorlds.Core;
 using TaleWorlds.Engine.GauntletUI;
-using TaleWorlds.InputSystem;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade.View.Screens;
 using TaleWorlds.ScreenSystem;
@@ -24,11 +24,10 @@ public class TemplateManagerScreen : ScreenBase, IGameStateListener
     private SpriteCategory? _navalCategory;
     private SpriteCategory _townManagementCategory;
     public TemplateStore TemplateStore { get; set; }
-    
+
 
     public TemplateManagerScreen(TemplateManagerState state)
     {
-
         _templateManagerState = state;
     }
 
@@ -50,10 +49,11 @@ public class TemplateManagerScreen : ScreenBase, IGameStateListener
 
     void IGameStateListener.OnActivate()
     {
+        
         SpriteData spriteData = UIResourceManager.SpriteData;
         TwoDimensionEngineResourceContext resourceContext = UIResourceManager.ResourceContext;
         ResourceDepot uIResourceDepot = UIResourceManager.ResourceDepot;
-        
+
         _clanCategory = spriteData.SpriteCategories["ui_clan"];
         _townManagementCategory = spriteData.SpriteCategories["ui_town_management"];
         _clanCategory.Load(resourceContext, uIResourceDepot);
@@ -64,7 +64,7 @@ public class TemplateManagerScreen : ScreenBase, IGameStateListener
             _navalCategory = navalCategory;
             _navalCategory.Load(resourceContext, uIResourceDepot);
         }
-        
+
         _layer = new GauntletLayer("TemplateManagerLayer", 11, true);
 
         _dataSource = new TemplateManagerVM(_templateManagerState);
@@ -104,16 +104,19 @@ public class TemplateManagerScreen : ScreenBase, IGameStateListener
                     continue;
                 }
 
-                AutoAssign.CatchUpAssignedHero(hero, template);
+                var target = new HeroAutoAssignTarget(hero);
+                AutoAssign.CatchUpAssignedHero(target, template);
             }
         }
     }
 
     void IGameStateListener.OnInitialize()
     {
+        ShowSkillLimitCompatibilityPatch.OnTemplateManagerOpened();
     }
 
     void IGameStateListener.OnFinalize()
     {
+        ShowSkillLimitCompatibilityPatch.OnTemplateManagerClosed();
     }
 }
