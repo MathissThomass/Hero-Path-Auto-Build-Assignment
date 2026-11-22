@@ -83,12 +83,12 @@ public class CharacterUtils
         return null;
     }
 
-    public static float GetLearningRate(Hero hero, SkillObject skill, int additionalFocus = 0)
+    public static float GetLearningRate(IAutoAssignTarget target, SkillObject skill, int additionalFocus = 0)
     {
-        var currentFocusLevel = hero.HeroDeveloper.GetFocus(skill);
-        var characterAttributes = hero.CharacterAttributes;
+        var currentFocusLevel = target.GetFocus(skill);
+        var characterAttributes = target.GetCharacterAttributes();
 
-        var skillLvl = hero.GetSkillValue(skill);
+        var skillLvl = target.Hero.GetSkillValue(skill);
         var learningRate = Campaign.Current.Models.CharacterDevelopmentModel
             .CalculateLearningRate(characterAttributes, currentFocusLevel + additionalFocus, skillLvl, skill, false)
             .ResultNumber;

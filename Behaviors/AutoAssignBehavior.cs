@@ -1,4 +1,5 @@
 ﻿using HeroPathAutoBuildAssignment.Data;
+using HeroPathAutoBuildAssignment.Models;
 using HeroPathAutoBuildAssignment.Settings;
 using HeroPathAutoBuildAssignment.Utils;
 using MCM.Abstractions.Base.Global;
@@ -41,7 +42,8 @@ public class AutoAssignBehavior : CampaignBehaviorBase
             if (isPerkGained)
             {
                 var initialLvl = skillLvl - change;
-                AutoAssign.AutoAssignPerkPoint(hero, heroTemplate, skill, initialLvl);
+                var target = new HeroAutoAssignTarget(hero);
+                AutoAssign.AutoAssignPerkPoint(target, heroTemplate, skill, initialLvl);
             }
         }
     }
@@ -53,6 +55,7 @@ public class AutoAssignBehavior : CampaignBehaviorBase
             var templateList = TemplateStore.Instance.TemplateList;
             var heroTemplate = CharacterUtils.FindHeroAssignedTemplate(hero, templateList);
             var settings = GlobalSettings<HeroPathSettings>.Instance;
+            var target = new HeroAutoAssignTarget(hero);
 
             if (heroTemplate == null || settings == null)
             {
@@ -61,12 +64,12 @@ public class AutoAssignBehavior : CampaignBehaviorBase
             
             if (settings.AttributAutomaticAssignment && hero.HeroDeveloper.UnspentAttributePoints > 0)
             {
-                AutoAssign.AutoAssignAttributPoint(hero, heroTemplate);
+                AutoAssign.AutoAssignAttributPoint(target, heroTemplate);
             }
 
             if (settings.FocusAutomaticAssignment && hero.HeroDeveloper.UnspentFocusPoints > 0)
             {
-                AutoAssign.AutoAssignFocusPoint(hero, heroTemplate);
+                AutoAssign.AutoAssignFocusPoint(target, heroTemplate);
             }
         }
     }
