@@ -26,6 +26,7 @@ public class TemplateManagerScreen : ScreenBase, IGameStateListener
     private SpriteCategory? _navalCategory;
     private SpriteCategory _townManagementCategory;
     public TemplateStore TemplateStore { get; set; }
+    private bool _wasInquiryActive;
 
 
     public TemplateManagerScreen(TemplateManagerState state)
@@ -42,15 +43,21 @@ public class TemplateManagerScreen : ScreenBase, IGameStateListener
             return;
         }
 
+        bool isInquiryActive = InformationManager.IsAnyInquiryActive();
+
         if (_layer.IsFocusedOnInput())
         {
+            _wasInquiryActive = isInquiryActive;
             return;
         }
-
-        if (InformationManager.IsAnyInquiryActive())
+        
+        if (isInquiryActive || _wasInquiryActive)
         {
+            _wasInquiryActive = isInquiryActive;
             return;
         }
+        
+        _wasInquiryActive = false;
 
         if (Input.IsKeyReleased(InputKey.Delete))
         {
@@ -58,8 +65,7 @@ public class TemplateManagerScreen : ScreenBase, IGameStateListener
         }
         
 
-        //caused to exit even with an Inquiry open and the inquiry exit before this is executed so can't just close the inquiry with this code active
-        /*if (Input.IsKeyReleased(InputKey.Escape))
+        if (Input.IsKeyReleased(InputKey.Escape))
         {
             _dataSource.ExecuteCancel();
         }
@@ -67,7 +73,7 @@ public class TemplateManagerScreen : ScreenBase, IGameStateListener
         if (Input.IsKeyReleased(InputKey.Enter) || Input.IsKeyReleased(InputKey.NumpadEnter))
         {
             _dataSource.ExecuteDone();
-        }*/
+        }
     }
 
     void IGameStateListener.OnActivate()
