@@ -4,9 +4,11 @@ using HeroPathAutoBuildAssignment.Data;
 using HeroPathAutoBuildAssignment.HarmonyPatches;
 using HeroPathAutoBuildAssignment.Models;
 using HeroPathAutoBuildAssignment.State;
+using HeroPathAutoBuildAssignment.Utils;
 using HeroPathAutoBuildAssignment.ViewModels;
 using TaleWorlds.Core;
 using TaleWorlds.Engine.GauntletUI;
+using TaleWorlds.InputSystem;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade.View.Screens;
 using TaleWorlds.ScreenSystem;
@@ -34,6 +36,27 @@ public class TemplateManagerScreen : ScreenBase, IGameStateListener
     protected override void OnFrameTick(float dt)
     {
         base.OnFrameTick(dt);
+
+        if (_dataSource == null || _layer == null)
+        {
+            return;
+        }
+
+        if (_layer.IsFocusedOnInput())
+        {
+            return;
+        }
+
+        if (InformationManager.IsAnyInquiryActive())
+        {
+            return;
+        }
+
+        if (Input.IsKeyReleased(InputKey.Delete))
+        {
+            _dataSource.ExecuteDeleteSelectedTemplate();
+        }
+        
 
         //caused to exit even with an Inquiry open and the inquiry exit before this is executed so can't just close the inquiry with this code active
         /*if (Input.IsKeyReleased(InputKey.Escape))

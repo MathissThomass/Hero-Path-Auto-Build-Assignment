@@ -237,6 +237,11 @@ public class TemplateManagerVM : ViewModel
         _currentTemplateIndex = index;
         _templateListVM.RefreshTemplateList(index);
     }
+    
+    public void ExecuteDeleteSelectedTemplate()
+    {
+        _templateListVM.ExecuteDeleteCurrent();
+    }
 
     private void RefreshValues()
     {

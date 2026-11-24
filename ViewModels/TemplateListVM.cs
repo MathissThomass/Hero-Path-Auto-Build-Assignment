@@ -63,7 +63,7 @@ public class TemplateListVM : ViewModel
         OnPropertyChanged("ListItemVM");
     }
 
-    private void ExecuteDeleteCurrent()
+    public void ExecuteDeleteCurrent()
     {
         string deleteTemplateInquiryTitle = new TextObject("{=delete_template_inquiry_title}Delete current template").ToString();
         string deleteTemplateInquiryText = new TextObject("{=delete_template_inquiry_text}Are you sure you want to delete the current template?").ToString();
