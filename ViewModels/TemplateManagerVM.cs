@@ -18,6 +18,8 @@ public class TemplateManagerVM : ViewModel
     TemplateManagerSkillGridVM _currentSkillGridVM;
     private MBBindingList<TemplateManagerSkillGridVM> SkillGridListVm;
     private TemplateListVM _templateListVM;
+    private TemplateHeroSelectionPopupVM _heroSelectionPopupVm;
+    private bool _isHeroListOpen;
 
     public TemplateManagerVM(TemplateManagerState templateManagerState)
     {
@@ -25,6 +27,8 @@ public class TemplateManagerVM : ViewModel
         templateManagerState.EditTemplate.CreateNewTemplate();
         _templateManagerCharacterList = new List<TemplateManagerCharacter>();
         _templateManagerCharacterList = TemplateSaveManager.LoadSavedTemplatesList();
+        _heroSelectionPopupVm = new TemplateHeroSelectionPopupVM();
+        _isHeroListOpen = false;
         int selectedIndex = 0;
         if (_templateManagerCharacterList.Count > 0)
         {
@@ -55,7 +59,8 @@ public class TemplateManagerVM : ViewModel
         _currentTemplateIndex = selectedIndex;
         _currentSkillGridVM = SkillGridListVm[selectedIndex];
         _templateListVM = new TemplateListVM(_templateManagerCharacterList, OnTemplateCharacterSelectedChange,
-            OnCreateNewTemplate, OnDeleteTemplate, selectedIndex);
+            OnCreateNewTemplate, OnDeleteTemplate, _heroSelectionPopupVm, OnOpenHeroListToAssign, OnRefreshTemplateList,
+            selectedIndex);
 
         _cancelLbl = new TextObject("{=3CpNUnVl}Cancel").ToString();
         _doneLbl = new TextObject("{=WiNRdfsm}Done").ToString();
@@ -105,9 +110,11 @@ public class TemplateManagerVM : ViewModel
 
         if (unSavedTemplate)
         {
-            string unsavedInquiryTitle = new TextObject("{=unsaved_inquiry_title}There is some unsaved template").ToString();
-            string unsavedInquiryText = new TextObject("{=unsaved_inquiry_text}Are you sure you want to continue?").ToString();
-            
+            string unsavedInquiryTitle =
+                new TextObject("{=unsaved_inquiry_title}There is some unsaved template").ToString();
+            string unsavedInquiryText =
+                new TextObject("{=unsaved_inquiry_text}Are you sure you want to continue?").ToString();
+
             var inquiry = new InquiryData(
                 titleText: unsavedInquiryTitle,
                 text: unsavedInquiryText,
@@ -237,10 +244,34 @@ public class TemplateManagerVM : ViewModel
         _currentTemplateIndex = index;
         _templateListVM.RefreshTemplateList(index);
     }
-    
+
     public void ExecuteDeleteSelectedTemplate()
     {
         _templateListVM.ExecuteDeleteCurrent();
+    }
+
+    private void OnOpenHeroListToAssign(TemplateListItemVM currentTemplateListItemVm)
+    {
+        _isHeroListOpen = !_isHeroListOpen;
+        OnPropertyChanged("IsHeroListOpen");
+        if (_isHeroListOpen)
+        {
+            var currentTemplate = currentTemplateListItemVm._templateManagerCharacter;
+            _heroSelectionPopupVm.OpenForTemplate(currentTemplate, _templateManagerCharacterList);
+        }
+        else
+        {
+            _heroSelectionPopupVm.Close();
+        }
+    }
+
+    private void OnRefreshTemplateList(TemplateListItemVM currentTemplateListItemVm)
+    {
+        if (IsHeroListOpen)
+        {
+            _heroSelectionPopupVm.OpenForTemplate(currentTemplateListItemVm._templateManagerCharacter,
+                _templateManagerCharacterList);
+        }
     }
 
     private void RefreshValues()
@@ -299,6 +330,34 @@ public class TemplateManagerVM : ViewModel
         get { return _templateListVM; }
     }
 
+    [DataSourceProperty]
+    public bool IsHeroListOpen
+    {
+        get { return _isHeroListOpen; }
+        set
+        {
+            if (value != _isHeroListOpen)
+            {
+                _isHeroListOpen = value;
+                OnPropertyChangedWithValue(value, "IsHeroListOpen");
+            }
+        }
+    }
+
+    [DataSourceProperty]
+    public TemplateHeroSelectionPopupVM HeroSelectionPopupVm
+    {
+        get { return _heroSelectionPopupVm; }
+        set
+        {
+            if (value != _heroSelectionPopupVm)
+            {
+                _heroSelectionPopupVm = value;
+                OnPropertyChangedWithValue(value, "HeroSelectionPopupVm");
+            }
+        }
+    }
+    
     [DataSourceProperty]
     public string TitleTemplateText { get; set; } = new TextObject("{=templates_title}Templates").ToString();
 }

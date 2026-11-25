@@ -30,6 +30,8 @@
                 <TemplateList DataSource="{TemplateListVM}" HorizontalAlignment="Left" VerticalAlignment="Stretch"
                               MarginBottom="30"/>
 
+                <TemplateHeroSelectionPopup Parameter.PopupDataSource="{HeroSelectionPopupVm}" IsVisible="@IsHeroListOpen" HorizontalAlignment="Left" VerticalAlignment="Center" MarginLeft="700" />
+
                 <Standard.TripleDialogCloseButtons VisualDefinition="BottomMenu" HorizontalAlignment="Center"
                                                    VerticalAlignment="Bottom" PositionYOffset="100"
                                                    Parameter.CancelButtonAction="ExecuteCancel"

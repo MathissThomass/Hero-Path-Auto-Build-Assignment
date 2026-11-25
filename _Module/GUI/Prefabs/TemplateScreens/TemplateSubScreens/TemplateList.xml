@@ -159,8 +159,6 @@
                     </Children>
                 </ListPanel>
 
-                <TemplateHeroSelectionPopup Parameter.PopupDataSource="{HeroSelectionPopupVm}" IsVisible="@IsHeroListOpen" HorizontalAlignment="Right" VerticalAlignment="Center" />
-
             </Children>
         </Widget>
     </Window>

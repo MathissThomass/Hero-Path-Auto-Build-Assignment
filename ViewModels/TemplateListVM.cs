@@ -8,7 +8,6 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
-using TaleWorlds.TwoDimension;
 
 namespace HeroPathAutoBuildAssignment.ViewModels;
 
@@ -20,13 +19,18 @@ public class TemplateListVM : ViewModel
     Action<TemplateManagerCharacter, int> _onTemplateSelectedChanged;
     private Action<TemplateManagerCharacter> _onCreateNewTemplate;
     private Action<TemplateManagerCharacter> _onDeleteTemplate;
+    private Action<TemplateListItemVM> _onOpenHeroListToAssign;
+    private Action<TemplateListItemVM> _onRefreshTemplateList;
     private TemplateHeroSelectionPopupVM _heroSelectionPopupVm;
-    private bool _isHeroListOpen;
+    private bool _isHeroSelectionListOpen;
 
     public TemplateListVM(List<TemplateManagerCharacter> templateManagerCharacterList,
         Action<TemplateManagerCharacter, int> onTemplateSelectedChanged,
         Action<TemplateManagerCharacter> onCreateNewTemplate,
         Action<TemplateManagerCharacter> onDeleteTemplate,
+        TemplateHeroSelectionPopupVM heroSelectionPopupVm,
+        Action<TemplateListItemVM> onOpenHeroListToAssign,
+        Action<TemplateListItemVM> onRefreshTemplateList,
         int initialIndex = 0)
     {
         _templateManagerCharacterList = templateManagerCharacterList;
@@ -34,8 +38,10 @@ public class TemplateListVM : ViewModel
         _onTemplateSelectedChanged = onTemplateSelectedChanged;
         _onCreateNewTemplate = onCreateNewTemplate;
         _onDeleteTemplate = onDeleteTemplate;
-        _heroSelectionPopupVm = new TemplateHeroSelectionPopupVM();
-        _isHeroListOpen = false;
+        _onOpenHeroListToAssign = onOpenHeroListToAssign;
+        _heroSelectionPopupVm = heroSelectionPopupVm;
+        _onRefreshTemplateList = onRefreshTemplateList;
+        _isHeroSelectionListOpen = false;
         RefreshTemplateList(initialIndex);
     }
 
@@ -50,26 +56,26 @@ public class TemplateListVM : ViewModel
         if (ListItemVM.Count > 0)
         {
             inspectedIndex = Math.Max(0, Math.Min(inspectedIndex, ListItemVM.Count - 1));
-            
+
             ListItemVM[inspectedIndex].IsInspected = true;
             _currentTemplateListItemVM = ListItemVM[inspectedIndex];
         }
 
-        if (IsHeroListOpen)
-        {
-            _heroSelectionPopupVm.OpenForTemplate(_currentTemplateListItemVM._templateManagerCharacter, _templateManagerCharacterList);
-        }
+        _onRefreshTemplateList(_currentTemplateListItemVM);
 
         OnPropertyChanged("ListItemVM");
     }
 
     public void ExecuteDeleteCurrent()
     {
-        string deleteTemplateInquiryTitle = new TextObject("{=delete_template_inquiry_title}Delete current template").ToString();
-        string deleteTemplateInquiryText = new TextObject("{=delete_template_inquiry_text}Are you sure you want to delete the current template?").ToString();
+        string deleteTemplateInquiryTitle =
+            new TextObject("{=delete_template_inquiry_title}Delete current template").ToString();
+        string deleteTemplateInquiryText =
+            new TextObject("{=delete_template_inquiry_text}Are you sure you want to delete the current template?")
+                .ToString();
         string deleteBtnText = new TextObject("{=deletekey}Delete").ToString();
         string cancelBtnText = new TextObject("{=3CpNUnVl}Cancel").ToString();
-        
+
         var inquiry = new InquiryData(
             titleText: deleteTemplateInquiryTitle,
             text: deleteTemplateInquiryText,
@@ -86,7 +92,7 @@ public class TemplateListVM : ViewModel
     private void ExecuteCreateNew()
     {
         string newCreatedTemplateText = new TextObject("{=new_created_template_text}New created template").ToString();
-        
+
         var newTemplate = new TemplateManagerCharacter
         {
             Name = GenerateUniqueName(newCreatedTemplateText)
@@ -101,7 +107,7 @@ public class TemplateListVM : ViewModel
     private void ExecuteDuplicateCurrentTemplate()
     {
         var original = _currentTemplateListItemVM._templateManagerCharacter;
-        
+
         var originalHeroList = original.HeroList;
         string json;
 
@@ -114,7 +120,7 @@ public class TemplateListVM : ViewModel
         {
             original.HeroList = originalHeroList;
         }
-        
+
         var newTemplate = JsonConvert.DeserializeObject<TemplateManagerCharacter>(json);
         newTemplate.Name = GenerateUniqueName("Duplicate " + newTemplate.Name);
         newTemplate.UpdateSavedStateSnapshot();
@@ -126,9 +132,10 @@ public class TemplateListVM : ViewModel
 
     private void ExecuteRenameCurrentTemplate()
     {
-        string newTemplateInquiryTitle = new TextObject("{=new_template_inquiry_title}Enter the template name").ToString();
+        string newTemplateInquiryTitle =
+            new TextObject("{=new_template_inquiry_title}Enter the template name").ToString();
         string newTemplateInquiryText = new TextObject("{=new_template_inquiry_text}New template name :").ToString();
-            
+
         var textInquiry = new TextInquiryData(
             titleText: newTemplateInquiryTitle,
             text: newTemplateInquiryText,
@@ -146,18 +153,9 @@ public class TemplateListVM : ViewModel
 
     private void ExecuteOpenHeroListToAssign()
     {
-        _isHeroListOpen = !_isHeroListOpen;
-        OnPropertyChanged("IsHeroListOpen");
+        _onOpenHeroListToAssign(_currentTemplateListItemVM);
+        _isHeroSelectionListOpen = !_isHeroSelectionListOpen;
         OnPropertyChanged("HeroListButtonBrushStringId");
-        if (_isHeroListOpen)
-        {
-            var currentTemplate = _currentTemplateListItemVM._templateManagerCharacter;
-            _heroSelectionPopupVm.OpenForTemplate(currentTemplate, _templateManagerCharacterList);
-        }
-        else
-        {
-            _heroSelectionPopupVm.Close();
-        }
     }
 
     private void OnEnterNameAfter(string newName)
@@ -185,7 +183,8 @@ public class TemplateListVM : ViewModel
             CurrentTemplateItemVM = templateListItemVm;
             int index = _listItemVm.IndexOf(templateListItemVm);
             _onTemplateSelectedChanged(CurrentTemplateItemVM._templateManagerCharacter, index);
-            _heroSelectionPopupVm.OpenForTemplate(templateListItemVm._templateManagerCharacter, _templateManagerCharacterList);
+            _heroSelectionPopupVm.OpenForTemplate(templateListItemVm._templateManagerCharacter,
+                _templateManagerCharacterList);
         }
     }
 
@@ -219,6 +218,7 @@ public class TemplateListVM : ViewModel
             candidate = $"{baseName} {counter}";
             counter++;
         } while (existingNames.Contains(candidate));
+
         return candidate;
     }
 
@@ -249,57 +249,30 @@ public class TemplateListVM : ViewModel
             }
         }
     }
-    
+
     [DataSourceProperty]
     public string HeroListButtonBrushStringId
     {
-        get { return _isHeroListOpen ? "ButtonBrush1" : "ButtonBrush2"; }
+        get { return _isHeroSelectionListOpen ? "ButtonBrush1" : "ButtonBrush2"; }
     }
 
     [DataSourceProperty]
-    public bool IsHeroListOpen
-    {
-        get { return _isHeroListOpen; }
-        set
-        {
-            if (value != _isHeroListOpen)
-            {
-                _isHeroListOpen = value;
-                OnPropertyChangedWithValue(value, "IsHeroListOpen");
-            }
-        }
-    }
-    
-    [DataSourceProperty]
-    public TemplateHeroSelectionPopupVM HeroSelectionPopupVm
-    {
-        get { return _heroSelectionPopupVm; }
-        set
-        {
-            if (value != _heroSelectionPopupVm)
-            {
-                _heroSelectionPopupVm = value;
-                OnPropertyChangedWithValue(value, "HeroSelectionPopupVm");
-            }
-        }
-    }
-    
-    [DataSourceProperty]
     public string TemplateListTitle { get; set; } = new TextObject("{=template_list_title}Template list").ToString();
-    
+
     [DataSourceProperty]
     public string DeleteCurrentText { get; set; } = new TextObject("{=delete_current_text}Delete current").ToString();
-    
+
     [DataSourceProperty]
     public string CreateNewText { get; set; } = new TextObject("{=create_new_text}Create New").ToString();
-    
+
     [DataSourceProperty]
-    public string DuplicateCurrentTemplateText { get; set; } = new TextObject("{=duplicate_current_template_text}Duplicate current template").ToString();
-    
+    public string DuplicateCurrentTemplateText { get; set; } =
+        new TextObject("{=duplicate_current_template_text}Duplicate current template").ToString();
+
     [DataSourceProperty]
-    public string RenameCurrentTemplateText { get; set; } = new TextObject("{=rename_current_template_text}Rename current template").ToString();
-    
+    public string RenameCurrentTemplateText { get; set; } =
+        new TextObject("{=rename_current_template_text}Rename current template").ToString();
+
     [DataSourceProperty]
     public string AssignToHeroText { get; set; } = new TextObject("{=assign_to_hero_text}Assign to hero").ToString();
-    
 }
