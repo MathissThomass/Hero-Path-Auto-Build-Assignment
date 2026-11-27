@@ -8,7 +8,7 @@
     </Parameters>
 
     <Window>
-        <Widget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren">
+        <Widget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" DataSource="*PopupDataSource" IsVisible="@IsHeroListOpen">
             <Children>
 
                 <!-- Navigation scope pour le popup -->
@@ -16,11 +16,11 @@
                 <NavigationScopeTargeter ScopeID="TemplateHeroSelectionScope" ScopeParent="..\Background" ScopeMovements="Horizontal" AlternateScopeMovements="Vertical" AlternateMovementStepSize="7" />
 
                 <!-- Fond du popup -->
-                <Widget Id="Background" DataSource="*PopupDataSource" WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="450" MaxHeight="500" HorizontalAlignment="Left" VerticalAlignment="Top" Sprite="governor_popup_9" ExtendLeft="13" ExtendTop="5" ExtendRight="13" ExtendBottom="14">
+                <Widget Id="Background" WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="450" MaxHeight="500" HorizontalAlignment="Left" VerticalAlignment="Top" Sprite="governor_popup_9" ExtendLeft="13" ExtendTop="5" ExtendRight="13" ExtendBottom="14">
                     <Children>
 
                         <!-- Titre -->
-                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="40" HorizontalAlignment="Center" VerticalAlignment="Top" Brush="Recruitment.Popup.Title.Text" Brush.FontSize="28" Text="@AssignToHeroText" MarginTop="10" />
+                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="40" HorizontalAlignment="Center" VerticalAlignment="Top" Brush="Recruitment.Popup.Title.Text" Brush.FontSize="28" Text="@HeroSelectionTitle" MarginTop="10" />
 
                         <!-- Scrollable grid 2 colonnes -->
                         <ScrollablePanel Id="Scroll" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" SuggestedHeight="420" MarginLeft="12" MarginRight="12" MarginTop="50" AutoHideScrollBars="true" ClipRect="ClipRect" InnerPanel="ClipRect\InnerList" VerticalScrollbar="..\ScrollbarParent\VerticalScrollbar">
@@ -52,6 +52,21 @@
 
                                     </Children>
                                 </Widget>
+
+                                <ButtonWidget Id="ConfirmSelection" DoNotPassEventsToChildren="true"
+                                              WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                                              SuggestedWidth="180" SuggestedHeight="40"
+                                              Brush="@ConfirmButtonBrushStringId"
+                                              VerticalAlignment="Bottom" MarginBottom="20"
+                                              HorizontalAlignment="Center" IsVisible="@IsConfirmButtonVisible"
+                                              IsEnabled="@IsConfirmEnabled"
+                                              Command.Click="ExecuteConfirmSelection">
+                                    <Children>
+                                        <RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                                                        Brush="OverlayPopup.ButtonText" Brush.FontSize="20"
+                                                        Text="@ConfirmSelectionText"/>
+                                    </Children>
+                                </ButtonWidget>
 
                             </Children>
                         </ScrollablePanel>

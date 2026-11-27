@@ -6,6 +6,7 @@
     <strings>
         <string id="templates_title" text="Modèles" />
         <string id="set_skill_priority_text" text="Définir la priorité de cette compétence :" />
+        <string id="import_perk_text" text="Importer les atouts" />
         <string id="clear_all_perks_text" text="Réinitialiser tous les atouts" />
         <string id="clear_all_skill_perk_text" text="Réinitialiser les atouts de la compétence" />
         <string id="template_list_title" text="Liste des modèles" />

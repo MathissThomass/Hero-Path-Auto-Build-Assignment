@@ -6,6 +6,7 @@
     <strings>
         <string id="templates_title" text="Templates" />
         <string id="set_skill_priority_text" text="Set the priority of this skill :" />
+        <string id="import_perk_text" text="Import perks" />
         <string id="clear_all_perks_text" text="Clear all perks" />
         <string id="clear_all_skill_perk_text" text="Clear all skill perks" />
         <string id="template_list_title" text="Template list" />

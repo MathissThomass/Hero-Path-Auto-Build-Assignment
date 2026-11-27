@@ -2,6 +2,7 @@
 using HeroPathAutoBuildAssignment.Models;
 using HeroPathAutoBuildAssignment.State;
 using HeroPathAutoBuildAssignment.Utils;
+using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
@@ -19,7 +20,6 @@ public class TemplateManagerVM : ViewModel
     private MBBindingList<TemplateManagerSkillGridVM> SkillGridListVm;
     private TemplateListVM _templateListVM;
     private TemplateHeroSelectionPopupVM _heroSelectionPopupVm;
-    private bool _isHeroListOpen;
 
     public TemplateManagerVM(TemplateManagerState templateManagerState)
     {
@@ -28,7 +28,6 @@ public class TemplateManagerVM : ViewModel
         _templateManagerCharacterList = new List<TemplateManagerCharacter>();
         _templateManagerCharacterList = TemplateSaveManager.LoadSavedTemplatesList();
         _heroSelectionPopupVm = new TemplateHeroSelectionPopupVM();
-        _isHeroListOpen = false;
         int selectedIndex = 0;
         if (_templateManagerCharacterList.Count > 0)
         {
@@ -53,18 +52,24 @@ public class TemplateManagerVM : ViewModel
 
         foreach (var templateManagerCharacter in _templateManagerCharacterList)
         {
-            SkillGridListVm.Add(new TemplateManagerSkillGridVM(templateManagerCharacter, OnSaveTemplate));
+            SkillGridListVm.Add(new TemplateManagerSkillGridVM(templateManagerCharacter, OnSaveTemplate,
+                OnExecuteOpenHeroSelectionForImportPerks, _heroSelectionPopupVm));
         }
 
         _currentTemplateIndex = selectedIndex;
         _currentSkillGridVM = SkillGridListVm[selectedIndex];
         _templateListVM = new TemplateListVM(_templateManagerCharacterList, OnTemplateCharacterSelectedChange,
-            OnCreateNewTemplate, OnDeleteTemplate, _heroSelectionPopupVm, OnOpenHeroListToAssign, OnRefreshTemplateList,
+            OnCreateNewTemplate, OnDeleteTemplate, _heroSelectionPopupVm, OnOpenHeroListToAssign,
             selectedIndex);
 
         _cancelLbl = new TextObject("{=3CpNUnVl}Cancel").ToString();
         _doneLbl = new TextObject("{=WiNRdfsm}Done").ToString();
         HeroesAssignedAtOpen = CollectAssignedHeroIds(_templateManagerCharacterList);
+        _heroSelectionPopupVm.ModeChanged += () =>
+        {
+            _templateListVM.OnHeroSelectionModeChanged();
+            _currentSkillGridVM.OnHeroSelectionModeChanged();
+        };
         RefreshValues();
     }
 
@@ -201,7 +206,8 @@ public class TemplateManagerVM : ViewModel
     private void OnCreateNewTemplate(TemplateManagerCharacter newTemplate)
     {
         newTemplate.SetIsFromNewCreatedTemplate(true);
-        SkillGridListVm.Add(new TemplateManagerSkillGridVM(newTemplate, OnSaveTemplate));
+        SkillGridListVm.Add(new TemplateManagerSkillGridVM(newTemplate, OnSaveTemplate,
+            OnExecuteOpenHeroSelectionForImportPerks, _heroSelectionPopupVm));
         _currentTemplate = newTemplate;
         _currentSkillGridVM = SkillGridListVm[SkillGridListVm.Count - 1];
         _currentTemplateIndex = _templateListVM.ListItemVM.Count - 1;
@@ -252,26 +258,45 @@ public class TemplateManagerVM : ViewModel
 
     private void OnOpenHeroListToAssign(TemplateListItemVM currentTemplateListItemVm)
     {
-        _isHeroListOpen = !_isHeroListOpen;
-        OnPropertyChanged("IsHeroListOpen");
-        if (_isHeroListOpen)
-        {
-            var currentTemplate = currentTemplateListItemVm._templateManagerCharacter;
-            _heroSelectionPopupVm.OpenForTemplate(currentTemplate, _templateManagerCharacterList);
-        }
-        else
+        if (_heroSelectionPopupVm.CurrentMode == HeroSelectionMode.Multiple)
         {
             _heroSelectionPopupVm.Close();
+            return;
         }
+
+        var currentTemplate = currentTemplateListItemVm._templateManagerCharacter;
+        _heroSelectionPopupVm.OpenForTemplate(currentTemplate, _templateManagerCharacterList);
+
+        OnPropertyChanged("IsHeroListOpen");
     }
 
-    private void OnRefreshTemplateList(TemplateListItemVM currentTemplateListItemVm)
+    private void OnExecuteOpenHeroSelectionForImportPerks()
     {
-        if (IsHeroListOpen)
+        if (_heroSelectionPopupVm.CurrentMode == HeroSelectionMode.Single)
         {
-            _heroSelectionPopupVm.OpenForTemplate(currentTemplateListItemVm._templateManagerCharacter,
-                _templateManagerCharacterList);
+            _heroSelectionPopupVm.Close();
+            return;
         }
+
+        _heroSelectionPopupVm.OpenForSingleHeroSelection(ImportAllPerksFromHeroToCurrentTemplate);
+
+        OnPropertyChanged("IsHeroListOpen");
+    }
+
+    private void ImportAllPerksFromHeroToCurrentTemplate(Hero hero)
+    {
+        _currentTemplate.ClearAllPerks();
+        TemplateHeroUtils.CopyPerksFromHeroToTemplate(_currentTemplate, hero);
+
+        foreach (var skillGridVm in SkillGridListVm)
+        {
+            foreach (var skillsVM in skillGridVm.SkillsVM)
+            {
+                skillsVM.RefreshSkillPerksState();
+            }
+        }
+
+        _currentSkillGridVM.CurrentSkill.RefreshSkillPerksState();
     }
 
     private void RefreshValues()
@@ -331,20 +356,6 @@ public class TemplateManagerVM : ViewModel
     }
 
     [DataSourceProperty]
-    public bool IsHeroListOpen
-    {
-        get { return _isHeroListOpen; }
-        set
-        {
-            if (value != _isHeroListOpen)
-            {
-                _isHeroListOpen = value;
-                OnPropertyChangedWithValue(value, "IsHeroListOpen");
-            }
-        }
-    }
-
-    [DataSourceProperty]
     public TemplateHeroSelectionPopupVM HeroSelectionPopupVm
     {
         get { return _heroSelectionPopupVm; }
@@ -357,7 +368,7 @@ public class TemplateManagerVM : ViewModel
             }
         }
     }
-    
+
     [DataSourceProperty]
     public string TitleTemplateText { get; set; } = new TextObject("{=templates_title}Templates").ToString();
 }

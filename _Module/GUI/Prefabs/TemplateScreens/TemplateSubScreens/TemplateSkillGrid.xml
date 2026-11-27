@@ -36,6 +36,18 @@
                             </Children>
                         </ButtonWidget>
 
+                        <ButtonWidget Id="ImportPerk" DoNotPassEventsToChildren="true"
+                                      WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
+                                      SuggestedWidth="180" SuggestedHeight="40"
+                                      Brush="@ImportPerkButtonBrushStringId" MarginLeft="50"
+                                      Command.Click="ExecuteOpenHeroSelectionForImportPerks">
+                            <Children>
+                                <RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"
+                                                Brush="OverlayPopup.ButtonText" Brush.FontSize="20"
+                                                Text="@ImportPerkText"/>
+                            </Children>
+                        </ButtonWidget>
+
                         <ButtonWidget Id="ClearAllPerks" DoNotPassEventsToChildren="true"
                                       WidthSizePolicy="Fixed" HeightSizePolicy="Fixed"
                                       SuggestedWidth="180" SuggestedHeight="40"

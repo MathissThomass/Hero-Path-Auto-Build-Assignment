@@ -21,15 +21,19 @@ public class TemplateManagerSkillGridVM : ViewModel
     private bool _suppressPriorityApply;
 
     Action<TemplateManagerCharacter> _onSaveTemplate;
+    private Action _onExecuteOpenHeroSelectionForImportPerks;
+    private TemplateHeroSelectionPopupVM _heroSelectionPopupVm;
 
     public TemplateManagerSkillGridVM(TemplateManagerCharacter templateCharacter,
-        Action<TemplateManagerCharacter> onSaveTemplate)
+        Action<TemplateManagerCharacter> onSaveTemplate, Action onExecuteOpenHeroSelectionForImportPerks, TemplateHeroSelectionPopupVM heroSelectionPopupVm)
     {
         TemplateCharacter = templateCharacter;
         _skillsVM = new MBBindingList<TemplateManagerSkillVM>();
         _useWarSailsSkillGrid = CharacterUtils.IsWarSailsActive();
         _useVanillaSkillGrid = !_useWarSailsSkillGrid;
         _onSaveTemplate = onSaveTemplate;
+        _onExecuteOpenHeroSelectionForImportPerks = onExecuteOpenHeroSelectionForImportPerks;
+        _heroSelectionPopupVm = heroSelectionPopupVm;
         RefreshHeroSkills();
     }
 
@@ -134,6 +138,16 @@ public class TemplateManagerSkillGridVM : ViewModel
         }
     }
 
+    public void ExecuteOpenHeroSelectionForImportPerks()
+    {
+        _onExecuteOpenHeroSelectionForImportPerks();
+    }
+
+    public void OnHeroSelectionModeChanged()
+    {
+        OnPropertyChanged("ImportPerkButtonBrushStringId");
+    }
+
     private void OnEnterNameAfter(string saveName)
     {
         TemplateCharacter.Name = saveName;
@@ -206,8 +220,18 @@ public class TemplateManagerSkillGridVM : ViewModel
     [DataSourceProperty]
     public string ClearAllSkillPerkText { get; set; } =
         new TextObject("{=clear_all_skill_perk_text}Clear all skill perks").ToString();
-    
+
     [DataSourceProperty]
     public string SetSkillPriorityText { get; set; } =
         new TextObject("{=set_skill_priority_text}Set the priority of this skill :").ToString();
+
+    [DataSourceProperty]
+    public string ImportPerkText { get; set; } = new TextObject("{=import_perk_text}Import perk").ToString();
+    
+    [DataSourceProperty]
+    public string ImportPerkButtonBrushStringId
+    {
+        get { return _heroSelectionPopupVm.CurrentMode == HeroSelectionMode.Single ? "ButtonBrush1" : "ButtonBrush2"; }
+    }
+
 }
